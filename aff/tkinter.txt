@@ -1,0 +1,33 @@
+import tkinter as tk
+from tkinter import messagebox
+
+# Fonction appelée lorsque le bouton est cliqué
+def on_button_click():
+    input_text = entry.get()
+    messagebox.showinfo("Information", f"Vous avez entré : {input_text}")
+
+# Fonction appelée lors d'un clic de souris
+def on_mouse_click(event):
+    label.config(text=f"Clic de souris à la position : ({event.x}, {event.y})")
+
+# Création de la fenêtre principale
+root = tk.Tk()
+root.title("Interface Utilisateur Simple")
+
+# Création d'un label
+label = tk.Label(root, text="Cliquez sur la fenêtre ou entrez du texte")
+label.pack(pady=10)
+
+# Création d'un champ de formulaire (Entry)
+entry = tk.Entry(root, width=40)
+entry.pack(pady=10)
+
+# Création d'un bouton
+button = tk.Button(root, text="Cliquez-moi", command=on_button_click)
+button.pack(pady=10)
+
+# Liaison de l'événement de clic de souris à la fenêtre
+root.bind("<Button-1>", on_mouse_click)
+
+# Lancement de la boucle principale de l'interface
+root.mainloop()
