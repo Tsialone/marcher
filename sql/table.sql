@@ -1,7 +1,11 @@
 CREATE TABLE marcher (
     idMarcher TEXT(255) PRIMARY KEY,
     nomMarcher TEXT(255),
-    prixLocation CURRENCY NOT NULL
+    prixLocation CURRENCY NOT NULL,
+    x INTEGER   NOT NULL,
+    y INTEGER NOT NULL , 
+    longueur INTEGER NOT NULL,
+    largeur INTEGER NOT NULL
 );
 
 CREATE TABLE box (

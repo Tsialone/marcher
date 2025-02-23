@@ -1,5 +1,6 @@
-DROP TABLE IF EXISTS marcher_reduction;
-DROP TABLE IF EXISTS payement_box;
-DROP TABLE IF EXISTS marcher_box;
-DROP TABLE IF EXISTS box;
-DROP TABLE IF EXISTS marcher;
+
+DROP TABLE  marcher_box;
+DROP TABLE  payement_box;
+DROP TABLE  marcher_reduction;
+DROP TABLE  marcher;
+DROP TABLE  box;

@@ -1,3 +1,46 @@
+import tkinter as tk
+from tkinter import messagebox
+from tsena.Box import *
+from tsena.PayementBox import PayementBox
+import traceback
+
+from fonction.Data import Data
+
+
+
 class Ecouteur:
-    def payementBlock ():
-        print("Test okok")
+    moisMapping = {
+            "Janvier": 1,
+            "Fevrier": 2,
+            "Mars": 3,
+            "Avril": 4,
+            "Mai": 5,
+            "Juin": 6,
+            "Juillet": 7,
+            "Aout": 8,
+            "Septembre": 9,
+            "Octobre": 10,
+            "Novembre": 11,
+            "Decembre": 12,
+            }
+    def payementBlock(idBlock,mois, annee):
+        try:
+            idBlock =idBlock.get()
+            mois = Ecouteur.moisMapping[mois.get()]
+            annee = int(annee.get())
+            payement = PayementBox()
+            payement.insertPayementBox(idBox=idBlock , mois=mois , annee=annee)
+            messagebox.showinfo("Success", f"Payement reussi")
+        except Exception as e:
+            messagebox.showerror("Erreur", f"Une erreur est survenue :\n{str(e)}")
+            print(traceback.format_exc())
+
+    def verification(mois, annee):
+        try:
+            
+            mois = Ecouteur.moisMapping[mois.get()]
+            annee = int(annee.get())
+            Data.changeColor(mois=mois  , annee=annee)
+        except Exception as e:
+            messagebox.showerror("Erreur", f"Une erreur est survenue :\n{str(e)}")
+            print(traceback.format_exc())

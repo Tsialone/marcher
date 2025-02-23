@@ -1,0 +1,43 @@
+from aff import Carte
+from tsena.Marcher import Marcher
+from tsena.MarcherBox import MarcherBox
+from tsena.PayementBox import PayementBox
+from tsena.Box import Box
+
+class Data:
+    tempMarcher = Marcher ()
+    tempBox = Box ()
+    tempMarcherBox=  MarcherBox ()
+    tempPayementBox = PayementBox()
+
+    allMarcherBox = tempMarcherBox.getAll()
+    allPayementBox =  tempPayementBox.getAll()
+    allBox = tempBox.getAll()
+    allMarcher = None
+    carte = None
+    fenetre = None
+    
+    
+
+    
+    @staticmethod
+    def drawMarcher ():
+            for marcher in Data.allMarcher:
+                marcher.dessinerBox()
+    
+    @staticmethod
+    def delete ():
+        for widget in Data.carte.winfo_children():
+            widget.destroy()
+    @staticmethod
+    def changeColor (mois , annee):
+        payement  = PayementBox()
+        for marcher in Data.allMarcher:
+            # marcher.delete("all")
+            for box in marcher.getBoxs():
+                    if payement.aPayer (box.getIdBox() , mois , annee): 
+                        box.setColor("green")
+                    else:
+                        box.setColor("red")
+        Data.drawMarcher()
+       

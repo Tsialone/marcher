@@ -1,6 +1,6 @@
 from connection.Connection import *
 from datetime import date
-from tsena.Box import *
+from tsena.Box import Box
 class PayementBox:
     def __init__(
         self, idPayement=None, idBox=None, mois=None, annee=None, datePayement=None
@@ -61,7 +61,7 @@ class PayementBox:
         return allObjet
     
     def insertPayementBox (self,  idBox,mois:int , annee:int):
-        
+            
             self.verificationDate(idBox   , mois   , annee)
             query = "INSERT INTO payement_box (idBox  , mois , annee , datePayement)VALUES(?,?,?,now())"
             Connection.execute(query , (idBox,mois , annee , ))
@@ -73,7 +73,15 @@ class PayementBox:
         datePay = date(annee , mois , 1)
         if  dateExercice > datePay:
             raise ValueError("Le payement ne doit pas etre avant l'exercice " + str(dateExercice) + " < " + str(date(annee , mois  , 1)) )
-        
+    def aPayer ( self ,idBox  , mois:int , annee:int):
+        self.verificationDate(idBox=idBox , mois=mois , annee=annee)
+        allPayementBox = self.getAll()
+        dateAverifie= date(annee , mois , 1)
+        for payement in allPayementBox:
+            datePaye = date(payement.getAnnee() , payement.getMois() , 1)
+            if payement.getIdBox() == idBox and dateAverifie == datePaye:
+                return True
+        return False
              
         
     
