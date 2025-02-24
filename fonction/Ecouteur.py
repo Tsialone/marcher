@@ -23,13 +23,14 @@ class Ecouteur:
             "Novembre": 11,
             "Decembre": 12,
             }
-    def payementBlock(idBlock,mois, annee):
+    def payementBlock(idBox,mois, annee , montant):
         try:
-            idBlock =idBlock.get()
+            idBox =idBox.get()
             mois = Ecouteur.moisMapping[mois.get()]
             annee = int(annee.get())
+            montant = float(montant.get())
             payement = PayementBox()
-            payement.insertPayementBox(idBox=idBlock , mois=mois , annee=annee)
+            payement.insertPayementBox(idBox=idBox , mois=mois , annee=annee , montant= montant)
             messagebox.showinfo("Success", f"Payement reussi")
         except Exception as e:
             messagebox.showerror("Erreur", f"Une erreur est survenue :\n{str(e)}")
@@ -37,7 +38,6 @@ class Ecouteur:
 
     def verification(mois, annee):
         try:
-            
             mois = Ecouteur.moisMapping[mois.get()]
             annee = int(annee.get())
             Data.changeColor(mois=mois  , annee=annee)

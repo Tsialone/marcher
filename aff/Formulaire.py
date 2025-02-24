@@ -41,7 +41,7 @@ class Formulaire(tk.Frame):
         self.Payementmontant.insert(0 , "Montant")
         
         #payement submit
-        self.submit = tk.Button(self, text="Payer", command=lambda:Ecouteur.payementBlock(self.payementBox , self.payementMois , self.payementAnnee) , width=5) 
+        self.submit = tk.Button(self, text="Payer", command=lambda:Ecouteur.payementBlock(self.payementBox , self.payementMois , self.payementAnnee , self.Payementmontant) , width=5) 
         self.submit.place(x=320 , y=50)
     def verificationComponent (self):
         # Première Combobox

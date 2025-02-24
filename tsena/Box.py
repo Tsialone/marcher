@@ -44,5 +44,6 @@ class Box(Rectangle):
             tempObjet  = self.getById(line[0])
             allObjet.append(tempObjet)
         return allObjet
-
-        
+    def getSurface (self):
+        return self.getLargeur() * self.getLongueur()
+    

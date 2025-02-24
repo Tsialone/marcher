@@ -11,8 +11,8 @@ CREATE TABLE marcher (
 CREATE TABLE box (
     idBox TEXT(255) PRIMARY KEY,
     nomBox TEXT(255),
-    longueur DOUBLE,
-    largeur DOUBLE
+    longueur CURRENCY,
+    largeur CURRENCY
 );
 
 CREATE TABLE marcher_box (
@@ -28,6 +28,7 @@ CREATE TABLE payement_box (
     mois INTEGER,
     annee INTEGER,
     datePayement DATE,
+    montant CURRENCY ,
     CONSTRAINT FK_payement_box FOREIGN KEY (idBox) REFERENCES box(idBox)
 );
 

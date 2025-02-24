@@ -21,9 +21,9 @@ class Data:
 
     
     @staticmethod
-    def drawMarcher ():
+    def drawMarcher (carte=Carte):
             for marcher in Data.allMarcher:
-                marcher.dessinerBox()
+                marcher.dessinerBox(carte)
     
     @staticmethod
     def delete ():
@@ -33,11 +33,10 @@ class Data:
     def changeColor (mois , annee):
         payement  = PayementBox()
         for marcher in Data.allMarcher:
-            # marcher.delete("all")
             for box in marcher.getBoxs():
                     if payement.aPayer (box.getIdBox() , mois , annee): 
                         box.setColor("green")
                     else:
                         box.setColor("red")
-        Data.drawMarcher()
+        Data.drawMarcher(Data.carte)
        

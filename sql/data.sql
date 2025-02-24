@@ -22,9 +22,3 @@ INSERT INTO marcher_reduction (idMarcher, reduction, mois, annee) VALUES ('M1', 
 INSERT INTO marcher_reduction (idMarcher, reduction, mois, annee) VALUES ('M1', 15.00, 2, 2023);
 INSERT INTO marcher_reduction (idMarcher, reduction, mois, annee) VALUES ('M2', 20.00, 1, 2023);
 
-INSERT INTO payement_box (idBox, mois, annee, datePayement) VALUES ('B1', 1, 2024, '2024-01-15');
-INSERT INTO payement_box (idBox, mois, annee, datePayement) VALUES ('B1', 2, 2024, '2024-02-10');
-INSERT INTO payement_box (idBox, mois, annee, datePayement) VALUES ('B2', 1, 2024, '2024-01-25');
-INSERT INTO payement_box (idBox, mois, annee, datePayement) VALUES ('B2', 3, 2024, '2024-03-05');
-INSERT INTO payement_box (idBox, mois, annee, datePayement) VALUES ('B3', 2, 2024, '2024-02-20');
-INSERT INTO payement_box (idBox, mois, annee, datePayement) VALUES ('B3', 4, 2024, '2024-04-02');
