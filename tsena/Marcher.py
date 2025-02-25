@@ -1,8 +1,10 @@
+from tkinter import messagebox
 from connection.Connection import *
 from fonction.Fonction import *
 from matplotlib.patches import Rectangle
 from aff.Carte import *
 import tkinter as tk
+from tsena.MarcherRa import MarcherRa
 from tsena.Box import Box
 
 
@@ -35,7 +37,12 @@ class Marcher:
     def setNomMarcher  (self , nomMarcher:str):
         self.__nomMarcher = nomMarcher
     
-    def getPrixLocation (self):
+    def getPrixLocation (self , mois:int):
+        tempMarcherRa = MarcherRa ()
+        tempMarcherRa = tempMarcherRa.getByIdMarcherMois(self.getIdMarcher() , mois=mois)
+        if tempMarcherRa:
+            messagebox.showinfo("Success", f"Vous avez une \n" + tempMarcherRa.get_raison() + " de " + str( abs(round (tempMarcherRa.get_pourcentage(), 2))) + "%")
+            return (self.__prixLocation + ((tempMarcherRa.get_pourcentage() / 100) * self.__prixLocation))
         return self.__prixLocation
     def getLongueur (self):
         return self.__longueur
@@ -116,3 +123,5 @@ class Marcher:
         centre_x_canvas = largeur / 2
         centre_y_canvas = hauteur / 2
         self.__canvas.create_text(centre_x_canvas, centre_y_canvas, text=self.getIdMarcher(), font=("Arial", 10, "bold", "italic"))
+
+    

@@ -9,6 +9,10 @@ from fonction.Data import Data
 
 
 class Ecouteur:
+    # def continuite ():
+    #     response= messagebox.askquestion ("Confirmation" , "Vous navez pas encore payer .... payer mantenant?" )
+    #     if response:
+    #         raise Exception ("Veuillez payer d'abord .... impayer\n 2003/02/20")
     moisMapping = {
             "Janvier": 1,
             "Fevrier": 2,
@@ -31,6 +35,7 @@ class Ecouteur:
             montant = float(montant.get())
             payement = PayementBox()
             payement.insertPayementBox(idBox=idBox , mois=mois , annee=annee , montant= montant)
+            # Ecouteur.continuite()
             messagebox.showinfo("Success", f"Payement reussi")
         except Exception as e:
             messagebox.showerror("Erreur", f"Une erreur est survenue :\n{str(e)}")

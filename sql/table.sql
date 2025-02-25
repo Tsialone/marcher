@@ -27,16 +27,18 @@ CREATE TABLE payement_box (
     idBox TEXT(255),
     mois INTEGER,
     annee INTEGER,
+    montant CURRENCY,
     datePayement DATE,
-    montant CURRENCY ,
-    CONSTRAINT FK_payement_box FOREIGN KEY (idBox) REFERENCES box(idBox)
+    CONSTRAINT FK_payement_box FOREIGN KEY (idBox) REFERENCES box(idBox),
+    CONSTRAINT UC_payement UNIQUE (idBox, mois, annee) 
 );
 
-CREATE TABLE marcher_reduction (
+CREATE TABLE marcher_ra (
     idMarcher TEXT(255),
-    reduction CURRENCY,
+    raison TEXT(255),
+    pourcentage CURRENCY,
     mois INTEGER,
-    annee INTEGER,
-    CONSTRAINT PK_marcher_reduction PRIMARY KEY (idMarcher, mois, annee),
-    CONSTRAINT FK_marcher_reduction FOREIGN KEY (idMarcher) REFERENCES marcher(idMarcher)
+    CONSTRAINT PK_marcher_ra PRIMARY KEY (idMarcher, mois),
+    CONSTRAINT FK_marcher_ra FOREIGN KEY (idMarcher) REFERENCES marcher(idMarcher)
 );
+

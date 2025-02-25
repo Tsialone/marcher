@@ -1,8 +1,10 @@
+from tkinter import messagebox
 from connection.Connection import *
 from datetime import date
 from tsena.Box import Box
 from tsena.MarcherBox import MarcherBox
 from tsena.Marcher import Marcher
+from dateutil.relativedelta import relativedelta
 class PayementBox:
     def __init__(
         self, idPayement=None, idBox=None, mois=None, annee=None, datePayement=None
@@ -76,13 +78,44 @@ class PayementBox:
                 if marcherBox.getIdBox() == idBox:
                         marcher = tempMarcher.getById(marcherBox.getIdMarcher())               
             if marcher:
-                tokonyAloha =  marcher.getPrixLocation() * boxSurface
+                tokonyAloha =  marcher.getPrixLocation(mois=mois) * boxSurface
                 print ("tokony  aloha " + str(tokonyAloha) + " montant " + str(montant))
                 if montant < tokonyAloha:
                     raise Exception ("Montant insuffisant vous devez payer \n" + str(round(tokonyAloha,2)) + "Ar")    
                 else:
-                    query = "INSERT INTO payement_box (idBox  , mois , annee , datePayement , montant)VALUES(?,?,?,now() ,?)"
+                  dateApayerDabord =  self.verificationImpayer(idBox=idBox , mois=mois , annee=annee)
+                  if dateApayerDabord:
+                    mois = dateApayerDabord.month
+                    annee = dateApayerDabord.year
+                    query = "INSERT INTO payement_box (idBox  , mois , annee  , montant , datePayement)VALUES(?,?,?,?,now())"
                     Connection.execute(query , (idBox,mois , annee , tokonyAloha ))
+
+    def verificationImpayer (self , idBox,mois:int , annee:int):
+        lastPay = self.getLastPayByBox(idBox=idBox)
+        jourPay = date(annee , mois , 1)
+        if lastPay == jourPay:
+            raise Exception ("Vous avez deja payez a cette date\n" + str(jourPay))
+        if lastPay is None:
+            tempBox  = Box ()
+            tempBox   = tempBox.getById(idBox=idBox)
+            debutExo = tempBox.getDebutExercice()
+            response= messagebox.askquestion ("Confirmation" , "Vous navez pas encore payer "+str(debutExo)+" payer mantenant? hahahah" )
+            if  response =="yes":
+                return debutExo
+            else:
+                raise Exception ("Veuillez d'abord payer votre location le \n" + str(debutExo))
+        elif lastPay and lastPay < jourPay:
+            tempBox  = Box ()
+            tempBox   = tempBox.getById(idBox=idBox)
+            debutExo = tempBox.getDebutExercice()
+            moisPlus1 = lastPay + relativedelta (months=1)
+            if moisPlus1 == jourPay:
+                return moisPlus1
+            response= messagebox.askquestion ("Confirmation" , "Vous navez pas encore payer "+str(moisPlus1)+" payer mantenant?" )
+            if  response =="yes":
+                return moisPlus1
+            else:
+                raise Exception ("Veuillez d'abord payer votre location le \n" + str(moisPlus1))
         
     def verificationDate ( self ,idBox  , mois:int , annee:int):
         tempBox =  Box()
@@ -102,12 +135,14 @@ class PayementBox:
         return False
     def getLastPayByBox (self, idBox):
         query = "SELECT * FROM payement_box WHERE idBox = ? ORDER BY DateSerial(annee, mois, 1) DESC"
+        tempBox = Box()
+        tempBox = tempBox.getById(idBox=idBox)
         objetSql = Connection.getExecute(query , (idBox ,))
         if objetSql:
             for line in objetSql:
                 dateTemp = date(line[3] , line[2] , 1)
                 return dateTemp
-        return None        
+        return None       
     
              
         
