@@ -14,6 +14,17 @@ CREATE TABLE box (
     longueur CURRENCY,
     largeur CURRENCY
 );
+CREATE TABLE locataire (
+    idLocataire TEXT(255) PRIMARY KEY,
+    nomLocataire TEXT(255) NOT NULL 
+);
+CREATE TABLE locataire_box (
+    idLocataire TEXT (255) ,
+    idBox TEXT (255) ,
+    CONSTRAINT PK__locataire_box PRIMARY KEY (idLocataire, idBox),
+    CONSTRAINT FK_locataire FOREIGN KEY (idLocataire) REFERENCES locataire(idLocataire),
+    CONSTRAINT FK_locataire_box FOREIGN KEY (idBox) REFERENCES box(idBox)
+);
 
 CREATE TABLE marcher_box (
     idBox TEXT(255),

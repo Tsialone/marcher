@@ -11,4 +11,4 @@ class Mouse:
         # for marcher in allMarcher:
         #     for box in marcher.getBoxs():
         #         if (box.contains(Mouse.mousePoint)):
-        #             messagebox.showinfo(str(box.getIdBox()) , "")
+        #             messagebox.showinfo(str(box.getIdBox()) , "")gi

@@ -1,1 +1,1 @@
-SELECT * FROM marcher_ra;
+SELECT * FROM locataire_box;
