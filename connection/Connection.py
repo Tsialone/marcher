@@ -3,7 +3,6 @@ import pyodbc
 class Connection:
     dbFile = r'E:\ITU\L2\S4\INF\Prog\Marcher\sql\marcher.accdb'
     connStr = r'DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=' + dbFile
-
     @classmethod
     def getExecute(cls, query, params=None):
         rows = None

@@ -12,6 +12,7 @@ class Box(Rectangle):
         self.__debutExrecice = date(2024 , 1 , 1)
         self.__color = "white"
         
+        
     
     def getIdBox (self):
         return self.__idBox

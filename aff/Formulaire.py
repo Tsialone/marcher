@@ -13,6 +13,7 @@ class Formulaire(tk.Frame):
         label.pack(pady=20)
         self.Payementcomponent()
         self.verificationComponent()
+        self.payementAvance()
 
     def Payementcomponent (self):
         # Première Combobox
@@ -21,12 +22,13 @@ class Formulaire(tk.Frame):
             values.append(i)
         self.payementAnnee = ttk.Combobox(self,values= values, width=7)
         self.payementAnnee.place(x=10 , y=50)# Aligner à gauche avec un padding
-
+        self.payementAnnee.insert(0,"Annee")
         # Deuxième Combobox
         mois = ["Janvier", "Fevrier", "Mars", "Avril", "Mai", "Juin", "Juillet", "Aout", "Septembre", "Octobre", "Novembre", "Decembre"]
         
         self.payementMois = ttk.Combobox(self, values=mois, width=7)
         self.payementMois.place(x=80 , y=50)# Aligner à gauche avec un padding
+        self.payementMois.insert(0,"Mois")
 
         # Troisième Combobox
         allBox = Box().getAll()
@@ -35,6 +37,8 @@ class Formulaire(tk.Frame):
             boxsId.append(box.getIdBox())
         self.payementBox = ttk.Combobox(self, values=boxsId, width=7 )
         self.payementBox.place(x=150 , y=50)
+        self.payementBox.insert(0,"Box")
+        
         
         self.Payementmontant = ttk.Entry(self, width=15 )
         self.Payementmontant.place(x=220 , y=50)
@@ -50,15 +54,43 @@ class Formulaire(tk.Frame):
             values.append(i)
         self.verificationAnnee = ttk.Combobox(self, values=values, width=10)
         self.verificationAnnee.place(x=10 , y=100)# Aligner à gauche avec un padding
+        self.verificationAnnee.insert(0,"Annee")
 
         # Deuxième Combobox
         mois = ["Janvier", "Fevrier", "Mars", "Avril", "Mai", "Juin", "Juillet", "Aout", "Septembre", "Octobre", "Novembre", "Decembre"]
         self.verificationMois = ttk.Combobox(self, values=mois, width=12)
         self.verificationMois.place(x=100 , y=100)# Aligner à gauche avec un padding
+        self.verificationMois.insert(0,"Mois")
 
         
         #payement submit
         self.submitV = tk.Button(self, text="Check", command=lambda: Ecouteur.verification(self.verificationMois , self.verificationAnnee), width=10) 
         self.submitV.place(x=200 , y=100)
+    
+    def payementAvance (self):
+        values= []
+        for i in range(1 , 13 , 1):
+            values.append(i)
+        self.nombreDeMois = ttk.Combobox(self, values=values, width=10)
+        self.nombreDeMois.place(x=10 , y=150)
+        self.nombreDeMois.insert(0,"Nbr mois")
+        # Deuxième Combobox
+        self.avanceMontant = ttk.Entry(self, width=15 )
+        self.avanceMontant.place(x=100 , y=150)
+        self.avanceMontant.insert(0 , "Montant")
+        
+        allBox = Box().getAll()
+        boxsId = []
+        for box in allBox:
+            boxsId.append(box.getIdBox())
+        self.avanceBox = ttk.Combobox(self, values=boxsId, width=7 )
+        self.avanceBox.place(x=200 , y=150)
+        self.avanceBox.insert(0,"Box")
+
+        
+        #payement submit
+        self.submitV = tk.Button(self, text="Payer en avance", command=lambda: Ecouteur.payementAvance(self.nombreDeMois , self.avanceMontant ,  self.avanceBox), width=15) 
+        self.submitV.place(x=275 , y=150)
+        
     
     

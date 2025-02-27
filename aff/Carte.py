@@ -5,3 +5,4 @@ class Carte(tk.Frame):
         super().__init__(parent, bg="lightblue", width=width, height=height)
         self.pack_propagate(False)  # Empêche le redimensionnement automatique
         self.place(x=10 , y=10)
+        

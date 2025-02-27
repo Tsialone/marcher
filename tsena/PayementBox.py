@@ -99,6 +99,8 @@ class PayementBox:
             tempBox  = Box ()
             tempBox   = tempBox.getById(idBox=idBox)
             debutExo = tempBox.getDebutExercice()
+            if jourPay  == debutExo:
+                return debutExo
             response= messagebox.askquestion ("Confirmation" , "Vous navez pas encore payer "+str(debutExo)+" payer mantenant? hahahah" )
             if  response =="yes":
                 return debutExo
@@ -142,7 +144,56 @@ class PayementBox:
             for line in objetSql:
                 dateTemp = date(line[3] , line[2] , 1)
                 return dateTemp
-        return None       
+        return None
+    def payementAvance (self , nombreMois:int , montant:float , idBox:str):
+        tempBox  = Box()
+        tempBox = tempBox.getById(idBox=idBox)
+        boxSurface = tempBox.getSurface()
+        tempMarcherBox = MarcherBox ()
+        allMarcherBox = tempMarcherBox.getAll()
+        tempMarcher = Marcher ()
+        marcher  = None
+        lastPay = self.getLastPayByBox(idBox=idBox)
+        dateExercice= tempBox.getDebutExercice()
+        tokonyAloha = 0
+        for marcherBox in allMarcherBox:
+            if marcherBox.getIdBox() == idBox:
+                    marcher = tempMarcher.getById(marcherBox.getIdMarcher())               
+        if marcher:
+            tempDate  = None
+            tokonyAloha = 0
+            if lastPay:
+                tempDate = lastPay +  relativedelta(months=1)
+            else:
+                tempDate = dateExercice
+            dateApayer = []
+            for i in range  (nombreMois):
+                dateApayer.append(tempDate)
+                tokonyAloha = tokonyAloha +   marcher.getPrixLocation(mois=tempDate.month) * boxSurface
+                tempDate = tempDate +  relativedelta(months=1)
+
+            print ("tokony  aloha " + str(tokonyAloha) + " montant " + str(montant))
+            if montant < tokonyAloha:
+                raise Exception ("Montant insuffisant vous devez payer \n" + str(round(tokonyAloha,2)) + "Ar sur ces dates \n" + str(dateApayer))    
+            else:
+                tempDate  = None
+                tokonyAloha = 0
+                if lastPay:
+                    tempDate = lastPay +  relativedelta(months=1)
+                else:
+                    tempDate = dateExercice
+                for i in range (nombreMois):
+                    query = "INSERT INTO payement_box (idBox  , mois , annee  , montant , datePayement)VALUES(?,?,?,?,now())"
+                    mois = tempDate.month
+                    annee = tempDate.year
+                    tokonyAloha =   marcher.getPrixLocation(mois=mois) * boxSurface
+                    Connection.execute(query , (idBox,mois , annee , tokonyAloha ))
+                    tempDate = tempDate + relativedelta(months=1)
+                           
+                                
+                        
+        
+        
     
              
         
