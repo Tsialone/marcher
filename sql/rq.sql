@@ -1,1 +1,1 @@
-SELECT * FROM locataire_box;
+SELECT * FROM payement_box;

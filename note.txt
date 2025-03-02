@@ -1,2 +1,3 @@
 -locataire ao anaty box
 -placement manuel des boxs
+-remove box na marher dia asiana repaint

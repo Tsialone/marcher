@@ -40,8 +40,7 @@ CREATE TABLE payement_box (
     annee INTEGER,
     montant CURRENCY,
     datePayement DATE,
-    CONSTRAINT FK_payement_box FOREIGN KEY (idBox) REFERENCES box(idBox),
-    CONSTRAINT UC_payement UNIQUE (idBox, mois, annee) 
+    CONSTRAINT FK_payement_box FOREIGN KEY (idBox) REFERENCES box(idBox)
 );
 
 CREATE TABLE marcher_ra (

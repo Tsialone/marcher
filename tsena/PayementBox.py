@@ -64,7 +64,7 @@ class PayementBox:
                 allObjet.append(tempObjet)
         return allObjet
     
-    def insertPayementBox (self,  idBox,mois:int , annee:int , montant):
+    def insertPayementBox (self,  idBox,mois:int , annee:int , montant:float):
             self.verificationDate(idBox   , mois   , annee)
             tempBox  = Box()
             tempBox = tempBox.getById(idBox=idBox)
@@ -78,23 +78,54 @@ class PayementBox:
                 if marcherBox.getIdBox() == idBox:
                         marcher = tempMarcher.getById(marcherBox.getIdMarcher())               
             if marcher:
-                tokonyAloha =  marcher.getPrixLocation(mois=mois) * boxSurface
-                print ("tokony  aloha " + str(tokonyAloha) + " montant " + str(montant))
-                if montant < tokonyAloha:
-                    raise Exception ("Montant insuffisant vous devez payer \n" + str(round(tokonyAloha,2)) + "Ar")    
-                else:
-                  dateApayerDabord =  self.verificationImpayer(idBox=idBox , mois=mois , annee=annee)
-                  if dateApayerDabord:
-                    mois = dateApayerDabord.month
-                    annee = dateApayerDabord.year
-                    query = "INSERT INTO payement_box (idBox  , mois , annee  , montant , datePayement)VALUES(?,?,?,?,now())"
-                    Connection.execute(query , (idBox,mois , annee , tokonyAloha ))
+                # vola
+                tokonyAloha =  0
+                voalohaBox =  self.getPayerByIdBox(idBox=idBox , mois=mois , annee=annee)   
+                resteApayer = 0
+                
+                lastPay = self.getLastPayByBox(idBox=idBox)
+                debuExo  = tempBox.getDebutExercice()
+                jourPay = date(annee , mois , 1)
+                
+                payer = True
+                if lastPay is None:
+                        lastPay = debuExo
+                if jourPay < lastPay:
+                    raise Exception ("Vous avez deja payer cette date:\n" + str(jourPay))
+                if jourPay > lastPay:
+                    response= messagebox.askquestion ("Confirmation" , "Vous navez pas encore payez la totalite du "+str(lastPay)+"\npayer mantenant?" )
+                    if  response =="yes":
+                        payer  = True
+                    else:
+                        payer = False
+                        raise Exception ("Payement revoquer")
+                if payer:
+                    while (montant > 0):
+                        mois = lastPay.month
+                        annee = lastPay.year
+                        tokonyAloha = marcher.getPrixLocation(mois=mois) * boxSurface
+                        voalohaBox =  self.getPayerByIdBox(idBox=idBox , mois=mois , annee=annee)  
+                        resteApayer =tokonyAloha - voalohaBox
+                        tempMontant = montant - resteApayer
+                        if tokonyAloha != voalohaBox:
+                            if tempMontant > 0:
+                                self.payer (idBox=idBox , mois=  lastPay.month ,annee= lastPay.year , montant=resteApayer)
+                                montant -= resteApayer
+                            if tempMontant < 0:
+                                self.payer (idBox=idBox , mois=  lastPay.month ,annee= lastPay.year , montant=montant)
+                                montant = 0
+                        if tokonyAloha == voalohaBox:
+                            lastPay = lastPay + relativedelta (months=1)
 
-    def verificationImpayer (self , idBox,mois:int , annee:int):
+                        
+    def payer (self , idBox , mois , annee , montant):
+             query = "INSERT INTO payement_box (idBox  , mois , annee  , montant , datePayement)VALUES(?,?,?,?,now())"
+             Connection.execute(query , (idBox,mois , annee , montant ))
+    def verificationImpayer (self , idBox,mois:int , annee:int , tokonyAloha:float , voaloha:float , montant:float):
         lastPay = self.getLastPayByBox(idBox=idBox)
         jourPay = date(annee , mois , 1)
-        if lastPay == jourPay:
-            raise Exception ("Vous avez deja payez a cette date\n" + str(jourPay))
+        # if lastPay == jourPay:
+            # raise Exception ("Vous avez deja payez a cette date\n" + str(jourPay))
         if lastPay is None:
             tempBox  = Box ()
             tempBox   = tempBox.getById(idBox=idBox)
@@ -106,11 +137,23 @@ class PayementBox:
                 return debutExo
             else:
                 raise Exception ("Veuillez d'abord payer votre location le \n" + str(debutExo))
-        elif lastPay and lastPay < jourPay:
+        elif lastPay and lastPay <= jourPay:
             tempBox  = Box ()
             tempBox   = tempBox.getById(idBox=idBox)
             debutExo = tempBox.getDebutExercice()
-            moisPlus1 = lastPay + relativedelta (months=1)
+            moisPlus1 = lastPay
+            resteApayer =tokonyAloha - voaloha 
+            montant =montant -resteApayer
+            print("Vous avez tout payer il vous reste \n" + str(resteApayer) + " Ar pour" + str(tokonyAloha))
+            
+            if resteApayer >=0:
+                # moisPlus1 = lastPay + relativedelta (months=1)
+                response= messagebox.askquestion ("Confirmation" , "Il vous reste a payer "+str(resteApayer)+"Ar pour "+str(jourPay)+" \npayer mantenant?" )
+            if  response =="yes":
+                self.insertPayementBox(idBox=idBox , mois=mois , annee=annee , montant=montant)
+                # return moisPlus1
+                # raise Exception ("Vous avez tout payer il vous reste \n" + str(resteApayer) + " Ar pour" + str(tokonyAloha))
+            # print(str(moisPlus1) + "  " + str(jourPay))
             if moisPlus1 == jourPay:
                 return moisPlus1
             response= messagebox.askquestion ("Confirmation" , "Vous navez pas encore payer "+str(moisPlus1)+" payer mantenant?" )
@@ -128,13 +171,27 @@ class PayementBox:
             raise Exception("Le payement ne doit pas etre avant l'exercice " + str(dateExercice) + " < " + str(date(annee , mois  , 1)) )
     def aPayer ( self ,idBox  , mois:int , annee:int):
         self.verificationDate(idBox=idBox , mois=mois , annee=annee)
-        allPayementBox = self.getAll()
-        dateAverifie= date(annee , mois , 1)
-        for payement in allPayementBox:
-            datePaye = date(payement.getAnnee() , payement.getMois() , 1)
-            if payement.getIdBox() == idBox and dateAverifie == datePaye:
+        tempBox = Box ()
+        tempBox = tempBox.getById(idBox)
+        tempMarcherBox = MarcherBox ()
+        
+        allMarcherBox = tempMarcherBox.getAll()
+        tempMarcher = Marcher ()
+        marcher  = None
+        
+        boxSurface = tempBox.getSurface ()
+        for marcherBox in allMarcherBox:
+            if marcherBox.getIdBox() == idBox:
+                    marcher = tempMarcher.getById(marcherBox.getIdMarcher())     
+                    break          
+        if marcher:
+            tokonyAloha = marcher.getPrixLocation(mois=mois , insertion=False) * boxSurface
+            voalohaBox =  self.getPayerByIdBox(idBox=idBox , mois=mois , annee=annee)
+            if tokonyAloha == voalohaBox:
                 return True
+        
         return False
+       
     def getLastPayByBox (self, idBox):
         query = "SELECT * FROM payement_box WHERE idBox = ? ORDER BY DateSerial(annee, mois, 1) DESC"
         tempBox = Box()
@@ -145,50 +202,18 @@ class PayementBox:
                 dateTemp = date(line[3] , line[2] , 1)
                 return dateTemp
         return None
-    def payementAvance (self , nombreMois:int , montant:float , idBox:str):
-        tempBox  = Box()
+    def getPayerByIdBox (self , idBox , mois:int , annee:int):
+        somme = 0
+        query = "SELECT * FROM payement_box WHERE idBox = ? AND mois = ? AND annee = ?"
+        tempBox = Box()
         tempBox = tempBox.getById(idBox=idBox)
-        boxSurface = tempBox.getSurface()
-        tempMarcherBox = MarcherBox ()
-        allMarcherBox = tempMarcherBox.getAll()
-        tempMarcher = Marcher ()
-        marcher  = None
-        lastPay = self.getLastPayByBox(idBox=idBox)
-        dateExercice= tempBox.getDebutExercice()
-        tokonyAloha = 0
-        for marcherBox in allMarcherBox:
-            if marcherBox.getIdBox() == idBox:
-                    marcher = tempMarcher.getById(marcherBox.getIdMarcher())               
-        if marcher:
-            tempDate  = None
-            tokonyAloha = 0
-            if lastPay:
-                tempDate = lastPay +  relativedelta(months=1)
-            else:
-                tempDate = dateExercice
-            dateApayer = []
-            for i in range  (nombreMois):
-                dateApayer.append(tempDate)
-                tokonyAloha = tokonyAloha +   marcher.getPrixLocation(mois=tempDate.month) * boxSurface
-                tempDate = tempDate +  relativedelta(months=1)
-
-            print ("tokony  aloha " + str(tokonyAloha) + " montant " + str(montant))
-            if montant < tokonyAloha:
-                raise Exception ("Montant insuffisant vous devez payer \n" + str(round(tokonyAloha,2)) + "Ar sur ces dates \n" + str(dateApayer))    
-            else:
-                tempDate  = None
-                tokonyAloha = 0
-                if lastPay:
-                    tempDate = lastPay +  relativedelta(months=1)
-                else:
-                    tempDate = dateExercice
-                for i in range (nombreMois):
-                    query = "INSERT INTO payement_box (idBox  , mois , annee  , montant , datePayement)VALUES(?,?,?,?,now())"
-                    mois = tempDate.month
-                    annee = tempDate.year
-                    tokonyAloha =   marcher.getPrixLocation(mois=mois) * boxSurface
-                    Connection.execute(query , (idBox,mois , annee , tokonyAloha ))
-                    tempDate = tempDate + relativedelta(months=1)
+        objetSql = Connection.getExecute(query , (idBox , mois , annee,))
+        if objetSql:
+            for line in objetSql:
+                somme += line[4]
+        return float (somme)
+        
+    
                            
                                 
                         

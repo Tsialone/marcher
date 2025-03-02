@@ -46,5 +46,9 @@ class Box(Rectangle):
             allObjet.append(tempObjet)
         return allObjet
     def getSurface (self):
-        return self.getLargeur() * self.getLongueur()
+        return float (self.getLargeur() * self.getLongueur())
+    def deleteById  (self , idBox):
+         query = "DELETE FROM box WHERE idBox=?"
+         Connection.execute(query , (idBox,))
+         
     

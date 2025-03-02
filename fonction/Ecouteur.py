@@ -47,18 +47,7 @@ class Ecouteur:
         except Exception as e:
             messagebox.showerror("Erreur", f"Une erreur est survenue :\n{str(e)}")
             print(traceback.format_exc())
-    def payementAvance (nombreMois , montant , idBox):
-        try:
-            nombreMois = int (nombreMois.get())
-            montant = float(montant.get())
-            idBox =  idBox.get()
-            payement = PayementBox()
-            print("nombre de mois "+str(nombreMois) + "\n" + "montant " + str(montant)+ "\n" + "montant " + str(idBox))
-            payement.payementAvance ( nombreMois , montant , idBox)
-            messagebox.showinfo("Success", f"Payement d'avance reussi")
-        except Exception as e:
-            messagebox.showerror("Erreur", f"Une erreur est survenue :\n{str(e)}")
-            print(traceback.format_exc())
+   
             
     
         
