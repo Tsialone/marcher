@@ -5,6 +5,7 @@ from tsena.Box import Box
 from tsena.MarcherBox import MarcherBox
 from tsena.Marcher import Marcher
 from dateutil.relativedelta import relativedelta
+from aff.Echelle import Echelle
 class PayementBox:
     def __init__(
         self, idPayement=None, idBox=None, mois=None, annee=None, datePayement=None
@@ -65,6 +66,7 @@ class PayementBox:
         return allObjet
     
     def insertPayementBox (self,  idBox,mois:int , annee:int , montant:float):
+            montant *=  Echelle.valeur
             self.verificationDate(idBox   , mois   , annee)
             tempBox  = Box()
             tempBox = tempBox.getById(idBox=idBox)
@@ -103,7 +105,7 @@ class PayementBox:
                     while (montant > 0):
                         mois = lastPay.month
                         annee = lastPay.year
-                        tokonyAloha = marcher.getPrixLocation(mois=mois) * boxSurface
+                        tokonyAloha =  marcher.getPrixLocation(mois=mois , annee=annee) * boxSurface
                         voalohaBox =  self.getPayerByIdBox(idBox=idBox , mois=mois , annee=annee)  
                         resteApayer =tokonyAloha - voalohaBox
                         tempMontant = montant - resteApayer
@@ -165,7 +167,8 @@ class PayementBox:
     def verificationDate ( self ,idBox  , mois:int , annee:int):
         tempBox =  Box()
         box = tempBox.getById(idBox)
-        dateExercice= box.getDebutExercice()
+        from fonction.Data import Data
+        dateExercice= Data.dateExercice
         datePay = date(annee , mois , 1)
         if  dateExercice > datePay:
             raise Exception("Le payement ne doit pas etre avant l'exercice " + str(dateExercice) + " < " + str(date(annee , mois  , 1)) )
@@ -185,7 +188,7 @@ class PayementBox:
                     marcher = tempMarcher.getById(marcherBox.getIdMarcher())     
                     break          
         if marcher:
-            tokonyAloha = marcher.getPrixLocation(mois=mois , insertion=False) * boxSurface
+            tokonyAloha = marcher.getPrixLocation(mois=mois , annee=annee , insertion=False) * boxSurface
             voalohaBox =  self.getPayerByIdBox(idBox=idBox , mois=mois , annee=annee)
             if tokonyAloha == voalohaBox:
                 return True

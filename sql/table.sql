@@ -18,13 +18,7 @@ CREATE TABLE locataire (
     idLocataire TEXT(255) PRIMARY KEY,
     nomLocataire TEXT(255) NOT NULL 
 );
-CREATE TABLE locataire_box (
-    idLocataire TEXT (255) ,
-    idBox TEXT (255) ,
-    CONSTRAINT PK__locataire_box PRIMARY KEY (idLocataire, idBox),
-    CONSTRAINT FK_locataire FOREIGN KEY (idLocataire) REFERENCES locataire(idLocataire),
-    CONSTRAINT FK_locataire_box FOREIGN KEY (idBox) REFERENCES box(idBox)
-);
+
 
 CREATE TABLE marcher_box (
     idBox TEXT(255),
@@ -44,11 +38,25 @@ CREATE TABLE payement_box (
 );
 
 CREATE TABLE marcher_ra (
-    idMarcher TEXT(255),
-    raison TEXT(255),
-    pourcentage CURRENCY,
-    mois INTEGER,
-    CONSTRAINT PK_marcher_ra PRIMARY KEY (idMarcher, mois),
-    CONSTRAINT FK_marcher_ra FOREIGN KEY (idMarcher) REFERENCES marcher(idMarcher)
+    idMarcherRa AUTOINCREMENT PRIMARY KEY,
+    idMarcher TEXT(255) NOT NULL,
+    annee INTEGER NOT NULL,
+    mois INTEGER NOT NULL,
+    valeur CURRENCY,
+    CONSTRAINT FK_marcher_ra FOREIGN KEY (idMarcher) REFERENCES marcher(idMarcher),
+    CONSTRAINT UQ_marcher_ra UNIQUE (idMarcher, annee, mois)
+);
+
+CREATE TABLE contrat (
+    idContrat AUTOINCREMENT PRIMARY KEY,
+    idBox TEXT(255) NOT NULL,
+    idLocataire TEXT(255) NOT NULL,
+    moisDebut INTEGER NOT NULL,
+    anneeDebut INTEGER NOT NULL,
+    moisFin INTEGER NOT NULL,
+    anneeFin INTEGER NOT NULL,
+    dateSignature DATE,
+    CONSTRAINT FK_contrat_box FOREIGN KEY (idBox) REFERENCES box(idBox),
+    CONSTRAINT FK_contrat_locataire FOREIGN KEY (idLocataire) REFERENCES locataire(idLocataire)
 );
 

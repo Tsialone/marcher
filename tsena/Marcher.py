@@ -6,6 +6,7 @@ from matplotlib.patches import Rectangle
 import tkinter as tk
 from tsena.MarcherRa import MarcherRa
 from tsena.Box import Box
+from aff.Echelle import Echelle
 
 # from fonction.Ecouteur import Ecouteur
 
@@ -28,8 +29,10 @@ class Marcher:
         self.__idMarcher = idMarcher
         self.__nomMarcher = nomMarcher
         self.__prixLocation = prixLocation
-        self.__longueur = longeur
-        self.__largeur = largeur
+        if longeur:
+            self.__longueur = longeur * Echelle.valeur
+        if largeur:
+            self.__largeur = largeur * Echelle.valeur
         self.__x = x
         self.__y = y
         self.__canvas = canvas
@@ -50,26 +53,17 @@ class Marcher:
     def setNomMarcher(self, nomMarcher: str):
         self.__nomMarcher = nomMarcher
 
-    def getPrixLocation(self, mois: int, insertion=True):
+    def getPrixLocation(self, mois: int, annee: int, insertion=True):
         tempMarcherRa = MarcherRa()
-        tempMarcherRa = tempMarcherRa.getByIdMarcherMois(self.getIdMarcher(), mois=mois)
+        tempMarcherRa = tempMarcherRa.getMarcherRaByDate(
+            self.getIdMarcher(), mois=mois, annee=annee
+        )
         if tempMarcherRa:
             if insertion:
                 messagebox.showinfo(
-                    "Success",
-                    f"Vous avez une \n"
-                    + tempMarcherRa.get_raison()
-                    + " de "
-                    + str(abs(round(tempMarcherRa.get_pourcentage(), 2)))
-                    + "%",
-                )
-            return float(
-                (
-                    self.__prixLocation
-                    + ((tempMarcherRa.get_pourcentage() / 100) * self.__prixLocation)
-                )
-            )
-        return float(self.__prixLocation)
+                    "Success", f"Changement de prix \n" + str(tempMarcherRa.getValeur()) + "Ar"+"\n" + tempMarcherRa.getIdMarcher() + "\n" + str(date(tempMarcherRa.getAnnee() , tempMarcherRa.getMois() , 1)))
+            return float(tempMarcherRa.getValeur() / Echelle.valeur)
+        return float(self.__prixLocation / Echelle.valeur)
 
     def getLongueur(self):
         return self.__longueur
@@ -118,26 +112,38 @@ class Marcher:
     def setBoxs(self, boxs):
         self.__boxs = boxs
 
-    def drawProgBox(self , mois , annee):
+    def drawProgBox(self, mois, annee):
         for box in self.getBoxs():
             boxSurface = box.getSurface()
             from tsena.PayementBox import PayementBox
+
             tempPayementBox = PayementBox()
-            tokonyAloha = self.getPrixLocation(mois=mois , insertion=False) * boxSurface
-            voalohaBox =  tempPayementBox.getPayerByIdBox(idBox=box.getIdBox() , mois=mois , annee=annee)
-            porcentageVoaloha  = voalohaBox /tokonyAloha
-            porcentageVoaloha *=100
-            print ("pourcentage voaloha " + str(porcentageVoaloha) + " " + box.getIdBox())
+            tokonyAloha = (
+                self.getPrixLocation(mois=mois, annee=annee, insertion=False)
+                * boxSurface
+            )
+            voalohaBox = tempPayementBox.getPayerByIdBox(
+                idBox=box.getIdBox(), mois=mois, annee=annee
+            )
+            porcentageVoaloha = voalohaBox / tokonyAloha
+            porcentageVoaloha *= 100
+            # print(
+            #     "pourcentage voaloha " + str(porcentageVoaloha) + " " + box.getIdBox() + " tokony aloha " + str(tokonyAloha) + " boxsurface " + str(boxSurface)
+            # )
             boxLargeur = box.getLargeur()
             boxLongueur = box.getLongueur()
             x = box.get_x()
             y = box.get_y()
 
-            progressWidth = float(boxLargeur) * (porcentageVoaloha / 100)  
+            progressWidth = float(boxLargeur) * (porcentageVoaloha / 100)
 
             self.__canvas.create_rectangle(
-                x, y, float (x) + float (progressWidth), float(y) + float(boxLongueur),
-                outline="black", fill="green"  
+                x,
+                y,
+                float(x) + float(progressWidth),
+                float(y) + float(boxLongueur),
+                outline="black",
+                fill="green",
             )
             centre_x = x + boxLargeur / 2
             centre_y = y + boxLongueur / 2
@@ -156,7 +162,7 @@ class Marcher:
             carte,
             width=self.__largeur,
             height=self.__longueur,
-            bg="white"
+            bg="white",
             # relief="solid",
         )
         self.__canvas.place(x=self.__x, y=self.__y)
@@ -181,13 +187,13 @@ class Marcher:
 
                 if y + boxLongueur + margin > hauteur:
                     self.__canvas.config(height=y + boxLongueur + margin)
-                    hauteur = self.winfo_height()
+                    hauteur = self.__canvas.winfo_height()
 
                 # box.set_width (box.getLargeur())
                 # box.set_height (box.getLongueur())
 
                 rect = self.__canvas.create_rectangle(
-                    (x, y), x + boxLargeur, y + boxLongueur, outline="black", fill="red"
+                    (x, y), x + boxLargeur, y + boxLongueur, outline="black", fill=box.getColor()
                 )
                 box.set_xy((x, y))
                 # box.set_width (box.getLargeur())

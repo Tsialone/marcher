@@ -1,11 +1,15 @@
+from datetime import date
 from aff import Carte
 from tsena.Marcher import Marcher
 from tsena.MarcherBox import MarcherBox
 from tsena.PayementBox import PayementBox
 from tsena.Box import Box
+from tsena.Contrat import Contrat
 
 
 class Data:
+    
+    dateExercice = date(2024 , 1 , 1)
     tempMarcher = Marcher()
     tempBox = Box()
     tempMarcherBox = MarcherBox()
@@ -36,10 +40,14 @@ class Data:
     @staticmethod
     def changeColor(mois, annee):
         payement = PayementBox()
+        tempContrat = Contrat ()
         for marcher in Data.allMarcher:
             for box in marcher.getBoxs():
                 if payement.aPayer(box.getIdBox(), mois, annee):
                     box.setColor("green")
+                elif tempContrat.getContratByIdBox(box.getIdBox(), mois, annee) is None:
+                    print(f"{box.getIdBox()}  { tempContrat.getContratByIdBox(box.getIdBox(), mois, annee)}")
+                    box.setColor("grey")
                 else:
                     box.setColor("red")
         Data.drawMarcher(Data.carte)
