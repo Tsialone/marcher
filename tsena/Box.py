@@ -2,6 +2,7 @@ from connection.Connection import *
 from datetime import *
 from matplotlib.patches import Rectangle
 from aff.Echelle import Echelle
+from tsena.Contrat import Contrat
 
 
 class Box(Rectangle):
@@ -27,8 +28,7 @@ class Box(Rectangle):
     def getLargeur(self):
         return self.__largeur
 
-    def getDebutExercice(self):
-        pass
+    
         
 
     def getColor(self):

@@ -28,13 +28,15 @@ CREATE TABLE marcher_box (
     CONSTRAINT FK_box FOREIGN KEY (idBox) REFERENCES box(idBox)
 );
 CREATE TABLE payement_box (
-    idPayement AUTOINCREMENT PRIMARY KEY,  
+    idPayement  AUTOINCREMENT PRIMARY KEY,
+    idLocataire TEXT(255),
     idBox TEXT(255),
     mois INTEGER,
     annee INTEGER,
     montant CURRENCY,
     datePayement DATE,
-    CONSTRAINT FK_payement_box FOREIGN KEY (idBox) REFERENCES box(idBox)
+    CONSTRAINT FK_payement_box_locataire FOREIGN KEY (idLocataire) REFERENCES locataire(idLocataire),
+    CONSTRAINT FK_payement_box_box FOREIGN KEY (idBox) REFERENCES box(idBox)
 );
 
 CREATE TABLE marcher_ra (

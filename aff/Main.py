@@ -23,7 +23,7 @@ from fonction.Data import Data
 
 fenetre = Fenetre("1200x700" ,"Marhcer")
 carte  = Carte(700 , 670 , fenetre)
-formulaire = Formulaire(420 , 670 , fenetre)
+formulaire = Formulaire(480 , 670 , fenetre)
 Data.allMarcher = Data.tempMarcher.getAll()
 Data.fenetre = fenetre
 

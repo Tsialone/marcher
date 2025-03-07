@@ -9,7 +9,7 @@ class Formulaire(tk.Frame):
     def __init__(self, width: int, height: int, parent: F.Fenetre):
         super().__init__(parent, bg="lightgrey", width=width, height=height)
         self.pack_propagate(False)
-        self.place(x=750, y=10)
+        self.place(x=720, y=10)
         label = tk.Label(self, text="Formulaire", bg="lightgrey")
         label.pack(pady=20)
         self.Payementcomponent()
@@ -17,50 +17,48 @@ class Formulaire(tk.Frame):
         self.contratComponent()
 
     def Payementcomponent(self):
-        # Première Combobox
-        values = []
-        for i in range(2030, 2000, -1):
-            values.append(i)
+        # Combobox Locataire
+        allLocataire = Locataire().getAll()
+        locatairesId = [locataire.getIdLocataire() for locataire in allLocataire]
+        self.payementLocataire = ttk.Combobox(self, values=locatairesId, width=10)
+        self.payementLocataire.place(x=10, y=50)
+        if locatairesId:
+            self.payementLocataire.insert(0, locatairesId[0])
+
+        # Combobox Box
+        allBox = Box().getAll()
+        boxsId = [box.getIdBox() for box in allBox]
+        self.payementBox = ttk.Combobox(self, values=boxsId, width=10)
+        self.payementBox.place(x=100, y=50)  # Rapprochement avec Locataire
+        if boxsId:
+            self.payementBox.insert(0, boxsId[0])
+
+        # Combobox Année
+        values = [i for i in range(2030, 2000, -1)]
         self.payementAnnee = ttk.Combobox(self, values=values, width=7)
-        self.payementAnnee.place(x=10, y=50)  # Aligner à gauche avec un padding
+        self.payementAnnee.place(x=190, y=50)  # Décalage vers la droite
         self.payementAnnee.insert(0, "Annee")
-        # Deuxième Combobox
+
+        # Combobox Mois
         mois = [
-            "Janvier",
-            "Fevrier",
-            "Mars",
-            "Avril",
-            "Mai",
-            "Juin",
-            "Juillet",
-            "Aout",
-            "Septembre",
-            "Octobre",
-            "Novembre",
-            "Decembre",
+            "Janvier", "Fevrier", "Mars", "Avril", "Mai", "Juin", "Juillet",
+            "Aout", "Septembre", "Octobre", "Novembre", "Decembre"
         ]
         self.payementMois = ttk.Combobox(self, values=mois, width=7)
-        self.payementMois.place(x=80, y=50)
+        self.payementMois.place(x=260, y=50)  # Décalage vers la droite
         self.payementMois.insert(0, "Mois")
 
-        # Troisième Combobox
-        allBox = Box().getAll()
-        boxsId = []
-        for box in allBox:
-            boxsId.append(box.getIdBox())
-        self.payementBox = ttk.Combobox(self, values=boxsId, width=7)
-        self.payementBox.place(x=150, y=50)
-        self.payementBox.insert(0, "Box")
-
+        # Entry Montant
         self.Payementmontant = ttk.Entry(self, width=15)
-        self.Payementmontant.place(x=220, y=50)
+        self.Payementmontant.place(x=330, y=50)  # Décalage vers la droite
         self.Payementmontant.insert(0, "Montant")
 
-        # payement submit
+        # Bouton Payer
         self.submit = tk.Button(
             self,
             text="Payer",
             command=lambda: Ecouteur.payementBlock(
+                self.payementLocataire, # Ajout de payementLocataire
                 self.payementBox,
                 self.payementMois,
                 self.payementAnnee,
@@ -68,7 +66,7 @@ class Formulaire(tk.Frame):
             ),
             width=5,
         )
-        self.submit.place(x=320, y=50)
+        self.submit.place(x=430, y=50) # Décalage vers la droite
 
     def verificationComponent(self):
         # Première Combobox

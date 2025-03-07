@@ -29,14 +29,15 @@ class Ecouteur:
             "Novembre": 11,
             "Decembre": 12,
             }
-    def payementBlock(idBox,mois, annee , montant):
+    def payementBlock(idLocataire,idBox,mois, annee , montant):
         try:
             idBox =idBox.get()
+            idLocataire = idLocataire.get()
             mois = Ecouteur.moisMapping[mois.get()]
             annee = int(annee.get())
             montant = float(montant.get())
             payement = PayementBox()
-            payement.insertPayementBox(idBox=idBox , mois=mois , annee=annee , montant= montant)
+            payement.insertPayementBox(idLocataire=idLocataire, idBox=idBox , mois=mois , annee=annee , montant= montant)
             # Ecouteur.continuite()
             messagebox.showinfo("Success", f"Payement reussi")
         except Exception as e:

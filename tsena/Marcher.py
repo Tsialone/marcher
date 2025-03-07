@@ -7,7 +7,7 @@ import tkinter as tk
 from tsena.MarcherRa import MarcherRa
 from tsena.Box import Box
 from aff.Echelle import Echelle
-
+from tsena.Contrat import Contrat
 # from fonction.Ecouteur import Ecouteur
 
 
@@ -114,42 +114,45 @@ class Marcher:
 
     def drawProgBox(self, mois, annee):
         for box in self.getBoxs():
-            boxSurface = box.getSurface()
-            from tsena.PayementBox import PayementBox
+            tempContrat = Contrat()
+            tempContrat = tempContrat.getContratByIdBox(idBox=box.getIdBox() , mois=mois ,annee=annee)
+            if tempContrat:
+                boxSurface = box.getSurface()
+                from tsena.PayementBox import PayementBox
 
-            tempPayementBox = PayementBox()
-            tokonyAloha = (
-                self.getPrixLocation(mois=mois, annee=annee, insertion=False)
-                * boxSurface
-            )
-            voalohaBox = tempPayementBox.getPayerByIdBox(
-                idBox=box.getIdBox(), mois=mois, annee=annee
-            )
-            porcentageVoaloha = voalohaBox / tokonyAloha
-            porcentageVoaloha *= 100
-            # print(
-            #     "pourcentage voaloha " + str(porcentageVoaloha) + " " + box.getIdBox() + " tokony aloha " + str(tokonyAloha) + " boxsurface " + str(boxSurface)
-            # )
-            boxLargeur = box.getLargeur()
-            boxLongueur = box.getLongueur()
-            x = box.get_x()
-            y = box.get_y()
+                tempPayementBox = PayementBox()
+                tokonyAloha = (
+                    self.getPrixLocation(mois=mois, annee=annee, insertion=False)
+                    * boxSurface
+                )
+                voalohaBox = tempPayementBox.getPayerByIdLocationIdBox(
+                    tempContrat.getIdLocataire() ,idBox=box.getIdBox(), mois=mois, annee=annee
+                )
+                porcentageVoaloha = voalohaBox / tokonyAloha
+                porcentageVoaloha *= 100
+                print(
+                    "pourcentage voaloha " + str(porcentageVoaloha) + " " + box.getIdBox() + " tokony aloha " + str(tokonyAloha) + " boxsurface " + str(boxSurface)
+                )
+                boxLargeur = box.getLargeur()
+                boxLongueur = box.getLongueur()
+                x = box.get_x()
+                y = box.get_y()
 
-            progressWidth = float(boxLargeur) * (porcentageVoaloha / 100)
+                progressWidth = float(boxLargeur) * (porcentageVoaloha / 100)
 
-            self.__canvas.create_rectangle(
-                x,
-                y,
-                float(x) + float(progressWidth),
-                float(y) + float(boxLongueur),
-                outline="black",
-                fill="green",
-            )
-            centre_x = x + boxLargeur / 2
-            centre_y = y + boxLongueur / 2
-            self.__canvas.create_text(
-                centre_x, centre_y, text=box.getIdBox(), font=("Arial", 10, "bold")
-            )
+                self.__canvas.create_rectangle(
+                    x,
+                    y,
+                    float(x) + float(progressWidth),
+                    float(y) + float(boxLongueur),
+                    outline="black",
+                    fill="green",
+                )
+                centre_x = x + boxLargeur / 2
+                centre_y = y + boxLongueur / 2
+                self.__canvas.create_text(
+                    centre_x, centre_y, text=box.getIdBox(), font=("Arial", 10, "bold")
+                )
 
     def dessinerBox(self, carte):
         boxs = self.getBoxs()

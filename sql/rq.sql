@@ -1,1 +1,1 @@
-SELECT * FROM contrat;
+SELECT * from contrat;

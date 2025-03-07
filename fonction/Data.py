@@ -43,10 +43,7 @@ class Data:
         tempContrat = Contrat ()
         for marcher in Data.allMarcher:
             for box in marcher.getBoxs():
-                if payement.aPayer(box.getIdBox(), mois, annee):
-                    box.setColor("green")
-                elif tempContrat.getContratByIdBox(box.getIdBox(), mois, annee) is None:
-                    print(f"{box.getIdBox()}  { tempContrat.getContratByIdBox(box.getIdBox(), mois, annee)}")
+                if tempContrat.getContratByIdBox(box.getIdBox(), mois, annee) is None:
                     box.setColor("grey")
                 else:
                     box.setColor("red")
