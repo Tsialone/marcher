@@ -1,1 +1,1 @@
-SELECT * from contrat;
+SELECT * FROM payement_box;

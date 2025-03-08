@@ -27,28 +27,6 @@ CREATE TABLE marcher_box (
     CONSTRAINT FK_marcher FOREIGN KEY (idMarcher) REFERENCES marcher(idMarcher),
     CONSTRAINT FK_box FOREIGN KEY (idBox) REFERENCES box(idBox)
 );
-CREATE TABLE payement_box (
-    idPayement  AUTOINCREMENT PRIMARY KEY,
-    idLocataire TEXT(255),
-    idBox TEXT(255),
-    mois INTEGER,
-    annee INTEGER,
-    montant CURRENCY,
-    datePayement DATE,
-    CONSTRAINT FK_payement_box_locataire FOREIGN KEY (idLocataire) REFERENCES locataire(idLocataire),
-    CONSTRAINT FK_payement_box_box FOREIGN KEY (idBox) REFERENCES box(idBox)
-);
-
-CREATE TABLE marcher_ra (
-    idMarcherRa AUTOINCREMENT PRIMARY KEY,
-    idMarcher TEXT(255) NOT NULL,
-    annee INTEGER NOT NULL,
-    mois INTEGER NOT NULL,
-    valeur CURRENCY,
-    CONSTRAINT FK_marcher_ra FOREIGN KEY (idMarcher) REFERENCES marcher(idMarcher),
-    CONSTRAINT UQ_marcher_ra UNIQUE (idMarcher, annee, mois)
-);
-
 CREATE TABLE contrat (
     idContrat AUTOINCREMENT PRIMARY KEY,
     idBox TEXT(255) NOT NULL,
@@ -61,4 +39,29 @@ CREATE TABLE contrat (
     CONSTRAINT FK_contrat_box FOREIGN KEY (idBox) REFERENCES box(idBox),
     CONSTRAINT FK_contrat_locataire FOREIGN KEY (idLocataire) REFERENCES locataire(idLocataire)
 );
+CREATE TABLE payement_box (
+    idPayement AUTOINCREMENT PRIMARY KEY,
+    idLocataire TEXT(255),
+    idBox TEXT(255),
+    idContrat INTEGER,
+    mois INTEGER,
+    annee INTEGER,
+    montant CURRENCY,
+    datePayement DATE,
+    CONSTRAINT FK_payement_box_locataire FOREIGN KEY (idLocataire) REFERENCES locataire(idLocataire),
+    CONSTRAINT FK_payement_box_box FOREIGN KEY (idBox) REFERENCES box(idBox),
+    CONSTRAINT FK_payement_box_contrat FOREIGN KEY (idContrat) REFERENCES contrat(idContrat)
+);
+
+CREATE TABLE marcher_ra (
+    idMarcherRa AUTOINCREMENT PRIMARY KEY,
+    idMarcher TEXT(255) NOT NULL,
+    annee INTEGER NOT NULL,
+    mois INTEGER NOT NULL,
+    valeur CURRENCY,
+    CONSTRAINT FK_marcher_ra FOREIGN KEY (idMarcher) REFERENCES marcher(idMarcher),
+    CONSTRAINT UQ_marcher_ra UNIQUE (idMarcher, annee, mois)
+);
+
+
 

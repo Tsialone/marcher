@@ -52,8 +52,11 @@ class Marcher:
 
     def setNomMarcher(self, nomMarcher: str):
         self.__nomMarcher = nomMarcher
-
-    def getPrixLocation(self, mois: int, annee: int, insertion=True):
+    def deleteComponent (self):
+        self.__canvas.delete("all")
+    def getCanvas (self):
+        return self.__canvas
+    def getPrixLocation(self, mois: int, annee: int, insertion=False):
         tempMarcherRa = MarcherRa()
         tempMarcherRa = tempMarcherRa.getMarcherRaByDate(
             self.getIdMarcher(), mois=mois, annee=annee
@@ -117,6 +120,7 @@ class Marcher:
             tempContrat = Contrat()
             tempContrat = tempContrat.getContratByIdBox(idBox=box.getIdBox() , mois=mois ,annee=annee)
             if tempContrat:
+                print(f"io ny contrat any {tempContrat.getIdContrat()}")
                 boxSurface = box.getSurface()
                 from tsena.PayementBox import PayementBox
 
@@ -126,12 +130,12 @@ class Marcher:
                     * boxSurface
                 )
                 voalohaBox = tempPayementBox.getPayerByIdLocationIdBox(
-                    tempContrat.getIdLocataire() ,idBox=box.getIdBox(), mois=mois, annee=annee
+                    tempContrat.getIdLocataire() ,idBox=box.getIdBox(), contrat=tempContrat
                 )
-                porcentageVoaloha = voalohaBox / tokonyAloha
+                porcentageVoaloha = float  (voalohaBox) / float (tokonyAloha)
                 porcentageVoaloha *= 100
                 print(
-                    "pourcentage voaloha " + str(porcentageVoaloha) + " " + box.getIdBox() + " tokony aloha " + str(tokonyAloha) + " boxsurface " + str(boxSurface)
+                    f"pourcentage voaloha {porcentageVoaloha}  {box.getIdBox()} tokony aloha {tokonyAloha}  voaloha {voalohaBox} boxsurface  {boxSurface}"
                 )
                 boxLargeur = box.getLargeur()
                 boxLongueur = box.getLongueur()
@@ -150,12 +154,13 @@ class Marcher:
                 )
                 centre_x = x + boxLargeur / 2
                 centre_y = y + boxLongueur / 2
-                self.__canvas.create_text(
-                    centre_x, centre_y, text=box.getIdBox(), font=("Arial", 10, "bold")
-                )
+                # self.__canvas.create_text(
+                #     centre_x, centre_y, text=f"{box.getIdBox()}:{tempContrat.getIdLocataire()}", font=("Arial", 10) 
+                # )
 
-    def dessinerBox(self, carte):
+    def dessinerBox(self, carte , mois:int=None , annee:int=None):
         boxs = self.getBoxs()
+        tempContrat = Contrat()
         largeur = self.getLargeur()
         hauteur = self.getLongueur()
         margin = 5
@@ -178,6 +183,9 @@ class Marcher:
             max_row_height = 0
 
             for box in boxs:
+                boxContrat = None
+                if mois and annee:
+                    boxContrat = tempContrat.getContratByIdBox(box.getIdBox(), mois, annee)
                 # self.__canvas.bind("<Button-1>"  , lambda event: Mouse.clickGauche(event,box=box))
 
                 boxLargeur = box.getLargeur()
@@ -194,7 +202,6 @@ class Marcher:
 
                 # box.set_width (box.getLargeur())
                 # box.set_height (box.getLongueur())
-
                 rect = self.__canvas.create_rectangle(
                     (x, y), x + boxLargeur, y + boxLongueur, outline="black", fill=box.getColor()
                 )
@@ -204,9 +211,13 @@ class Marcher:
 
                 centre_x = x + boxLargeur / 2
                 centre_y = y + boxLongueur / 2
-                self.__canvas.create_text(
-                    centre_x, centre_y, text=box.getIdBox(), font=("Arial", 10, "bold")
-                )
+                locId = None
+                if boxContrat:
+                    locId = boxContrat.getIdLocataire()
+                # self.__canvas.create_text(
+                #         centre_x, centre_y, text=f"{box.getIdBox()}:{locId} ", font=("Arial", 10) 
+                # )
+               
 
                 x += boxLargeur + margin
                 max_row_height = max(max_row_height, boxLongueur)

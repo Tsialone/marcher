@@ -1,4 +1,5 @@
 from connection.Connection import Connection
+Connection.init()
 from fonction.Fonction import *
 from tsena.Marcher import Marcher
 from tsena.MarcherBox import MarcherBox
@@ -16,11 +17,6 @@ from fonction.Data import Data
     
 
 
-# try:
-#     tempPayementBox.insertPayementBox("B1" , 12 , 2023)
-# except ValueError as e:
-#     print(e)
-
 fenetre = Fenetre("1200x700" ,"Marhcer")
 carte  = Carte(700 , 670 , fenetre)
 formulaire = Formulaire(480 , 670 , fenetre)
@@ -29,6 +25,8 @@ Data.fenetre = fenetre
 
 Data.carte  =carte
 Data.drawMarcher(carte)
+Data.drawTextMarcher()
+
 
     
 

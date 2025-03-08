@@ -21,10 +21,10 @@ INSERT INTO marcher_box (idBox, idMarcher) VALUES ('B5', 'Analakely');
 
 
 
-INSERT INTO marcher_ra (idMarcher, annee, mois, valeur) VALUES ('Behoririka', 2024, 1, 500000);
-INSERT INTO marcher_ra (idMarcher, annee, mois, valeur) VALUES ('Behoririka', 2024, 9, 450000);
-INSERT INTO marcher_ra (idMarcher, annee, mois, valeur) VALUES ('Analakely', 2024, 7, 300000);
-INSERT INTO marcher_ra (idMarcher, annee, mois, valeur) VALUES ('Analakely', 2024, 4, 280000);
+INSERT INTO marcher_ra (idMarcher, annee, mois, valeur) VALUES ('Behoririka', 2024, 1, 500);
+INSERT INTO marcher_ra (idMarcher, annee, mois, valeur) VALUES ('Behoririka', 2024, 9, 200);
+INSERT INTO marcher_ra (idMarcher, annee, mois, valeur) VALUES ('Analakely', 2024, 7, 100);
+INSERT INTO marcher_ra (idMarcher, annee, mois, valeur) VALUES ('Analakely', 2024, 4, 50);
 
 
 

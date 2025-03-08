@@ -1,2 +1,2 @@
 class Echelle:
-    valeur = 1
+    valeur = 3

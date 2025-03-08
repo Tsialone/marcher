@@ -11,11 +11,12 @@ from tsena.Contrat import Contrat
 from fonction.Fonction import Fonction
 class PayementBox:
     def __init__(
-        self, idPayement=None,idLocataire = None ,  idBox=None,  mois=None, annee=None,montant=None , datePayement=None
+        self, idPayement=None,idLocataire = None ,  idBox=None, idContrat=None , mois=None, annee=None,montant=None , datePayement=None
     ):
         self.__idPayement = idPayement
         self.__idLocataire  = idLocataire
         self.__idBox = idBox
+        self.__idContrat = idContrat
         self.__mois = mois
         self.__annee = annee
         self.__montant = montant
@@ -26,6 +27,8 @@ class PayementBox:
         return self.__idPayement
     def getIdLocataire(self):
         return self.__idLocataire
+    def getIdContrat(self):
+        return self.__idContrat
     
     def getMontant (self):
         return self.__montant
@@ -75,12 +78,12 @@ class PayementBox:
                 allObjet.append(tempObjet)
         return allObjet
     
-    def insertPayementBox (self, idLocataire , idBox,mois:int , annee:int , montant:float):
+    def insertPayementBox (self, idLocataire , idBox,mois:int , annee:int , montant:float ):
             montant *=  Echelle.valeur
+            print(f"momo {montant}")
             tempLocataire = Locataire ()
             tempLocataire  = tempLocataire.getById(idLocataire=idLocataire)
-            locataireContrat = tempLocataire.getContratByMoisAnnee(idBox=idBox, mois=mois  ,annee=annee)
-            allSortedContrat = tempLocataire.getAncienContrat(tempLocataire.getIdLocataire())
+           
             if tempLocataire.aBox (idBox=idBox , mois=mois , annee=annee) is not True:
                 raise Exception (f"Vous n'avez pas louez cette box:{idBox} veuillez choir une autre")
             self.verificationDate(idBox   , mois   , annee , idLocataire=idLocataire)
@@ -93,12 +96,29 @@ class PayementBox:
             marcher  = None
             tokonyAloha = 0
             
+            locataireContrat = tempLocataire.getContratByMoisAnnee(idBox=idBox, mois=mois  ,annee=annee)
+            allSortedContrat = tempLocataire.getAncienContrat(tempLocataire.getIdLocataire())
+            
+            
             for contrat in allSortedContrat:
-                if self.aPayer (idLocataire=idLocataire  , idBox=idBox , mois=mois , annee=annee  ,  contrat=  locataireContrat) is not True and contrat.getIdBox() != idBox:
-                    response= messagebox.askquestion ("Confirmation" , "Vous devez payer votre box"+str(contrat.getIdBox())+"\npayer mantenant?" )
+                # print(f" {contrat.getIdContrat()} {contrat.getIdBox()} {contrat.getIdLocataire()} {date(contrat.getAnneeDebut() , contrat.getMoisDebut() , 1)} {date(contrat.getAnneeFin() , contrat.getMoisFin() , 1)}" )
+                if   contrat.getIdBox() == idBox:
+                    print(f"aa miala {idBox}")
+                    break
+                if self.aPayer (idLocataire=idLocataire  , idBox=contrat.getIdBox() , mois=mois , annee=annee  ,  contrat=  contrat) is not True:
+                    response= messagebox.askquestion ("Confirmation" , f"Vous devez payer votre box d'abord {contrat.getIdBox()} \ncontrat:  {date(contrat.getAnneeDebut() , contrat.getMoisDebut() , 1)} - {date(contrat.getAnneeFin() , contrat.getMoisFin() , 1)} \npayer mantenant?" )
                     if  response =="yes":
                         payer  = True
                         idBox = contrat.getIdBox()
+                        tempBox = tempBox.getById(idBox=idBox)
+                        boxSurface = tempBox.getSurface()
+                        locataireContrat = contrat
+                        lastPay = self.getLastPayByLocataireBox(idLocataire=idLocataire,idBox=idBox  , idContrat= locataireContrat.getIdContrat() )
+                        mois = locataireContrat.getMoisDebut()
+                        annee = locataireContrat.getAnneeDebut()
+                        if lastPay:
+                            mois = lastPay.month
+                            annee = lastPay.year
                         break
                     else:
                         payer = False
@@ -106,22 +126,34 @@ class PayementBox:
                 
             for marcherBox in allMarcherBox:
                 if marcherBox.getIdBox() == idBox:
-                        marcher = tempMarcher.getById(marcherBox.getIdMarcher())               
+                        marcher = tempMarcher.getById(marcherBox.getIdMarcher())
+                        break               
+            if locataireContrat:
+                # print(f"contrat any t@ io date io =>{locataireContrat.getIdContrat()} {locataireContrat.getIdBox()} {locataireContrat.getIdLocataire()} {date(locataireContrat.getAnneeDebut() , locataireContrat.getMoisDebut() , 1)} {date(locataireContrat.getAnneeFin() , locataireContrat.getMoisFin() , 1)}")
+                # print(f"mois{mois} et anne{annee}")
+                tokonyAloha =  marcher.getPrixLocation(mois=mois , annee=annee , insertion=False) * boxSurface
+                voalohaBox = float  (self.getPayerByIdLocationIdBox( idLocataire=idLocataire,idBox=idBox , contrat= locataireContrat)   )
+                # print(f"tokony aloha {tokonyAloha },  voaloha {voalohaBox}")
+            else:
+                raise Exception (f"Vous n'avez pas louez cette box {idBox} ou fin de contrat pour {tempLocataire.getFinContrat(idBox=idBox , mois=mois , annee=annee)} {tempLocataire.getIdLocataire()}")
             if marcher:
-            #     # vola
-                tokonyAloha =  0
+                #vola
+                tokonyAloha =  marcher.getPrixLocation(mois=mois , annee=annee , insertion=False) * boxSurface
                 voalohaBox =  self.getPayerByIdLocationIdBox( idLocataire=idLocataire,idBox=idBox ,  contrat=locataireContrat)   
                 resteApayer = 0
                 
-                lastPay = self.getLastPayByLocataireBox(idLocataire=idLocataire,idBox=idBox)
-                debuExo  = tempLocataire.getDebutExercice(idBox=idBox , mois=mois , annee=annee)
+                lastPay = self.getLastPayByLocataireBox(idLocataire=idLocataire,idBox=idBox  , idContrat= locataireContrat.getIdContrat() )
+                debuExo  = tempLocataire.getDebutContrat(idBox=idBox , mois=mois , annee=annee)
                 jourPay = date(annee , mois , 1)
                 
                 payer = True
+                # print(f"last pay {lastPay}")
                 if lastPay is None:
                     lastPay = debuExo
-                if jourPay < lastPay:
-                    raise Exception ("Vous avez deja payer cette date:\n" + str(jourPay))
+                # print(f"last pay after ver {lastPay}")
+                
+                if   voalohaBox == tokonyAloha:
+                    raise Exception ("Vous avez deja payer la totalite cette date:\n" + str(jourPay))
                 if jourPay > lastPay:
                     response= messagebox.askquestion ("Confirmation" , "Vous navez pas encore payez la totalite du "+str(lastPay)+"\npayer mantenant? xxxx" )
                     if  response =="yes":
@@ -134,8 +166,9 @@ class PayementBox:
                         # if self.aPayer (contrat.getIdLocataire() , contrat.getIdBox() , contrat.get)
                     
                 if payer:
-                    print(f"last pay{lastPay} {tempLocataire.getFinExercice(idBox=idBox , mois=mois , annee=annee)} {tempLocataire.getIdLocataire()}")
-                    while (montant > 0 and tempLocataire.getFinExercice(idBox=idBox , mois=mois , annee=annee) and lastPay <= tempLocataire.getFinExercice(idBox=idBox , mois=mois , annee=annee)):
+                    # print(f"none ? {tempLocataire.getFinContrat(idBox=idBox , mois=staticMois , annee=staticAnnee)}  idBox:{idBox}  mois:{mois} annee:{annee}")
+                    while (montant > 0  ):
+                        # print(f"last pay{lastPay} {tempLocataire.getFinContrat(idBox=idBox , mois=mois , annee=annee)} {tempLocataire.getIdLocataire()}")
                         mois = lastPay.month
                         annee = lastPay.year
                         tokonyAloha =  marcher.getPrixLocation(mois=mois , annee=annee) * boxSurface
@@ -145,72 +178,59 @@ class PayementBox:
                             # raise Exception (f"Vous avez tout payer tokony{tokonyAloha }  voaloha  {voalohaBox}")
                         resteApayer =tokonyAloha - voalohaBox
                         tempMontant = montant - resteApayer
+                        print(f"reste a payer {resteApayer} tempMontant {tempMontant}")
                         if tokonyAloha != voalohaBox:
                             if tempMontant > 0:
-                                self.payer (idLocataire=idLocataire ,idBox=idBox , mois=  lastPay.month ,annee= lastPay.year , montant=resteApayer)
+                                self.payer (idLocataire=idLocataire ,idBox=idBox , idContrat=locataireContrat.getIdContrat()  , mois=  lastPay.month ,annee= lastPay.year , montant=resteApayer)
                                 montant -= resteApayer
-                            if tempMontant < 0:
-                                self.payer (idLocataire=idLocataire , idBox=idBox , mois=  lastPay.month ,annee= lastPay.year , montant=montant)
+                            if tempMontant <= 0:
+                                self.payer (idLocataire=idLocataire ,  idBox=idBox , idContrat=locataireContrat.getIdContrat() , mois=  lastPay.month ,annee= lastPay.year , montant=montant)
                                 montant = 0
+                                print(f"tss miala eto {montant} {idBox} tokony {tokonyAloha}")
                         if tokonyAloha == voalohaBox:
-                            lastPay = lastPay + relativedelta (months=1)
+                            # lastPay = lastPay + relativedelta (months=1)
+                            print(f"voaloha daholo {idBox}  mois:{mois} annee:{annee}")
+                            tsyMisyAntitra = True
+                            for contrat in allSortedContrat:
+                                # if   contrat.getIdBox() == idBox:
+                                #     print(f"tayy")
+                                #     break
+                                if  self.aPayer (idLocataire=idLocataire  , idBox=contrat.getIdBox() , mois=mois , annee=annee  ,  contrat=  contrat) is not True:
+                                    tsyMisyAntitra = False
+                                    print(f"{contrat.getIdBox()}  {contrat.getIdContrat()}")
+                                    response= messagebox.askquestion ("Confirmation" , f"Vous devez payer votre box d'abord {contrat.getIdBox()} \ncontrat:  {date(contrat.getAnneeDebut() , contrat.getMoisDebut() , 1)} - {date(contrat.getAnneeFin() , contrat.getMoisFin() , 1)} \npayer mantenant? Recurcive" )
+                                    if  response =="yes":
+                                        # idBox = contrat.getIdBox()
+                                        # mois = contrat.getMoisDebut()
+                                        # annee = contrat.getAnneeDebut()
+                                        # if lastPay:
+                                        #     mois = lastPay.month
+                                        #     annee = lastPay.year
+                                        print(f"handoa vao2 mois: {contrat.getMoisDebut()} et annee: {contrat.getAnneeDebut()} idBox: {contrat.getIdBox()}")
+                                        montant =  self.insertPayementBox (idLocataire , contrat.getIdBox(),contrat.getMoisDebut() , contrat.getAnneeDebut() , montant=montant )
+                                        break
+                                    else:
+                                        raise Exception ("Payement revoquer")
+                                if tsyMisyAntitra:
+                                    return montant
+                    return montant        # print(f" zao ilay none? {lastPay}  hum {date (locataireContrat.getAnneeFin () ,locataireContrat.getMoisFin () , 1)}")
                         
 
                         
-    def payer(self, idLocataire, idBox, mois, annee, montant):
+    def payer(self, idLocataire, idBox, idContrat , mois, annee, montant ):
         query = """
-            INSERT INTO payement_box (idLocataire, idBox, mois, annee, montant, datePayement)
-            VALUES (?, ?, ?, ?, ?, Now())
+            INSERT INTO payement_box (idLocataire, idBox, idContrat , mois, annee, montant, datePayement)
+            VALUES (?, ?,?  ,?, ?, ?, Now())
         """
-        params = (idLocataire, idBox, mois, annee, montant)
+        params = (idLocataire, idBox , idContrat, mois, annee, montant)
         Connection.execute(query, params)
-    def verificationImpayer (self , idBox,mois:int , annee:int , tokonyAloha:float , voaloha:float , montant:float):
-        lastPay = self.getLastPayByBox(idBox=idBox)
-        jourPay = date(annee , mois , 1)
-        # if lastPay == jourPay:
-            # raise Exception ("Vous avez deja payez a cette date\n" + str(jourPay))
-        if lastPay is None:
-            tempBox  = Box ()
-            tempBox   = tempBox.getById(idBox=idBox)
-            debutExo = tempBox.getDebutExercice()
-            if jourPay  == debutExo:
-                return debutExo
-            response= messagebox.askquestion ("Confirmation" , "Vous navez pas encore payer "+str(debutExo)+" payer mantenant? hahahah" )
-            if  response =="yes":
-                return debutExo
-            else:
-                raise Exception ("Veuillez d'abord payer votre location le \n" + str(debutExo))
-        elif lastPay and lastPay <= jourPay:
-            tempBox  = Box ()
-            tempBox   = tempBox.getById(idBox=idBox)
-            debutExo = tempBox.getDebutExercice()
-            moisPlus1 = lastPay
-            resteApayer =tokonyAloha - voaloha 
-            montant =montant -resteApayer
-            print("Vous avez tout payer il vous reste \n" + str(resteApayer) + " Ar pour" + str(tokonyAloha))
-            
-            if resteApayer >=0:
-                # moisPlus1 = lastPay + relativedelta (months=1)
-                response= messagebox.askquestion ("Confirmation" , "Il vous reste a payer "+str(resteApayer)+"Ar pour "+str(jourPay)+" \npayer mantenant?" )
-            if  response =="yes":
-                self.insertPayementBox(idBox=idBox , mois=mois , annee=annee , montant=montant)
-                # return moisPlus1
-                # raise Exception ("Vous avez tout payer il vous reste \n" + str(resteApayer) + " Ar pour" + str(tokonyAloha))
-            # print(str(moisPlus1) + "  " + str(jourPay))
-            if moisPlus1 == jourPay:
-                return moisPlus1
-            response= messagebox.askquestion ("Confirmation" , "Vous navez pas encore payer "+str(moisPlus1)+" payer mantenant?" )
-            if  response =="yes":
-                return moisPlus1
-            else:
-                raise Exception ("Veuillez d'abord payer votre location le \n" + str(moisPlus1))
-        
+      
     def verificationDate ( self ,idBox  , mois:int , annee:int , idLocataire =None):
         if idLocataire:
             tempLocataire = Locataire ()
             datePay = date(annee , mois , 1)
             tempLocataire  = tempLocataire.getById(idLocataire=idLocataire)
-            debutExo = tempLocataire.getDebutExercice(idBox=idBox , mois=mois , annee=annee)
+            debutExo = tempLocataire.getDebutContrat(idBox=idBox , mois=mois , annee=annee)
             if  debutExo and debutExo > datePay:
                 raise Exception("Le payement ne doit pas etre avant l'exercice " + str(debutExo) + " < " + str(date(annee , mois  , 1)) )
         else:
@@ -239,19 +259,20 @@ class PayementBox:
         if marcher:
             tokonyAloha = marcher.getPrixLocation(mois=mois , annee=annee , insertion=False) * boxSurface
             voalohaBox =  self.getPayerByIdLocationIdBox(idLocataire=idLocataire ,idBox=idBox , contrat=contrat)
-            print(f"{tokonyAloha}  {voalohaBox}")
+            print(f" a verifier {tokonyAloha}  {voalohaBox}")
             if tokonyAloha == voalohaBox:
                 return True
+                
         return False
        
-    def getLastPayByLocataireBox(self, idLocataire, idBox):
+    def getLastPayByLocataireBox(self, idLocataire, idBox , idContrat):
         query = """
             SELECT annee, mois
             FROM payement_box
-            WHERE idLocataire = ? AND idBox = ?
+            WHERE idLocataire = ? AND idBox = ? AND idContrat = ?
             ORDER BY annee DESC, mois DESC
         """
-        objetSql = Connection.getExecute(query, (idLocataire, idBox))
+        objetSql = Connection.getExecute(query, (idLocataire, idBox , idContrat))
 
         if objetSql:
             annee = objetSql[0][0]  # Première ligne, colonne année
@@ -264,23 +285,18 @@ class PayementBox:
         tempPayement = PayementBox()
         allPayement = tempPayement.getAll()
 
-        if contrat:  
-            dateDebut_contrat = date(contrat.getAnneeDebut(), contrat.getMoisDebut(), 1)
-            dateFin_contrat = date(contrat.getAnneeFin(), contrat.getMoisFin(), 1)
-
+        if contrat: 
             for paye in allPayement:
-                if paye.getIdLocataire() == idLocataire and paye.getIdBox() == idBox:
-                    dateVerifie = date(paye.getAnnee(), paye.getMois(), 1)
-                    if Fonction.intersectDate(dateDebut_contrat, dateFin_contrat, dateVerifie):
-                        somme += paye.getMontant()  # Assurez-vous que getMontant() existe
-
+                # print (f"Base {paye.getIdLocataire()} {paye.getIdBox()} { paye.getIdContrat()} ") 
+                # print (f"Input {idLocataire} {idBox} { contrat.getIdContrat()} ") 
+                
+                if paye.getIdLocataire() == idLocataire and paye.getIdBox() == idBox and paye.getIdContrat() == contrat.getIdContrat():
+                        # print(f"reto valeur {paye.getMontant()}")
+                        somme += paye.getMontant()  
         return somme
         
-                                
-                        
-        
-        
-    
+                            
+                                  
              
         
     

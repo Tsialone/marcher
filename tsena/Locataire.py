@@ -60,29 +60,15 @@ class Locataire:
         return False  
     
     
-    def getDebutExercice(self , idBox , mois:int , annee:int):
-        tempcontrat = Contrat()
-        allContrat = tempcontrat.getAll()
-        dateVerifie = date(annee, mois, 1)  
-        for contrat in allContrat:
-            if self.getIdLocataire() == contrat.getIdLocataire() and contrat.getIdBox() == idBox:
-                dateDebut_contrat = date(contrat.getAnneeDebut(), contrat.getMoisDebut(), 1)
-                dateFin_contrat = date(contrat.getAnneeFin(), contrat.getMoisFin(), 1)
-                if Fonction.intersectDate(dateDebut_contrat, dateFin_contrat, dateVerifie):
-                    return dateDebut_contrat
+    def getDebutContrat(self , idBox , mois:int , annee:int):
+        locataireContrat =  self.getContratByMoisAnnee(idBox=idBox, mois=mois  ,annee=annee)
+        if locataireContrat:
+            return date (locataireContrat.getAnneeDebut()  , locataireContrat.getMoisDebut() , 1)
         return None
-    def getFinExercice(self , idBox , mois:int , annee:int):
-        tempcontrat = Contrat()
-        allContrat = tempcontrat.getAll()
-        dateVerifie = date(annee, mois, 1)  
-        for contrat in allContrat:
-            if self.getIdLocataire() == contrat.getIdLocataire() and contrat.getIdBox() == idBox:
-                dateDebut_contrat = date(contrat.getAnneeDebut(), contrat.getMoisDebut(), 1)
-                dateFin_contrat = date(contrat.getAnneeFin(), contrat.getMoisFin(), 1)
-                if Fonction.intersectDate(dateDebut_contrat, dateFin_contrat, dateVerifie):
-                    # date_precedente = dateFin_contrat - relativedelta(months=1)
-                    return dateFin_contrat
-                    # return dateFin_contrat
+    def getFinContrat(self , idBox , mois:int , annee:int):
+        locataireContrat =  self.getContratByMoisAnnee(idBox=idBox, mois=mois  ,annee=annee)
+        if locataireContrat:
+            return date (locataireContrat.getAnneeFin()  , locataireContrat.getMoisFin () , 1)
         return None
     def getAncienContrat (self , idLocataire):
         allContrats = self.getContrats (idLocataire=idLocataire)
@@ -100,14 +86,17 @@ class Locataire:
         return contrats
     def getContratByMoisAnnee (self  , idBox , mois , annee):
         dateVerifie = date(annee, mois, 1)
-        tempcontrat = Contrat()  
+        tempcontrat = Contrat()
         allContrats = tempcontrat.getAll()
+
         for contrat in allContrats:
-            if contrat.getIdLocataire() == self.getIdLocataire() and contrat.getIdBox () == idBox :
+            if contrat.getIdLocataire() == self.getIdLocataire() and contrat.getIdBox() == idBox:
                 dateDebut_contrat = date(contrat.getAnneeDebut(), contrat.getMoisDebut(), 1)
                 dateFin_contrat = date(contrat.getAnneeFin(), contrat.getMoisFin(), 1)
-                if Fonction.intersectDate(dateDebut_contrat, dateFin_contrat, dateVerifie):
+                datePrecedente = dateFin_contrat - relativedelta(months=1)  
+                if Fonction.intersectDate(dateDebut_contrat, datePrecedente, dateVerifie):
                     return contrat
+
         return None
             
         

@@ -1,3 +1,4 @@
+from matplotlib.dates import relativedelta
 from connection.Connection import *
 from datetime import *
 from fonction.Fonction import Fonction
@@ -92,13 +93,12 @@ class Contrat:
     def insert(self):
         allContrat = self.getAll()
         for contrat in allContrat:
-            if (
-                contrat.getIdBox() == self.__idBox
-            ):  # Vérifier uniquement les contrats pour la même box
                 dateDebut_contrat = date(
                     contrat.getAnneeDebut(), contrat.getMoisDebut(), 1
                 )
                 dateFin_contrat = date(contrat.getAnneeFin(), contrat.getMoisFin(), 1)
+                dateFin_contrat = dateFin_contrat - relativedelta(months=1)  
+                
                 dateDebut_nouveau = date(self.__anneeDebut, self.__moisDebut, 1)
                 dateFin_nouveau = date(self.__anneeFin, self.__moisFin, 1)
 
@@ -160,6 +160,7 @@ class Contrat:
                     contrat.getAnneeDebut(), contrat.getMoisDebut(), 1
                 )
                 dateFin_contrat = date(contrat.getAnneeFin(), contrat.getMoisFin(), 1)
+                dateFin_contrat = dateFin_contrat - relativedelta(months=1)  
                 if Fonction.intersectDate(
                     dateDebut_contrat, dateFin_contrat, dateVerify
                 ):
