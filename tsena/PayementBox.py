@@ -145,6 +145,7 @@ class PayementBox:
                 lastPay = self.getLastPayByLocataireBox(idLocataire=idLocataire,idBox=idBox  , idContrat= locataireContrat.getIdContrat() )
                 debuExo  = tempLocataire.getDebutContrat(idBox=idBox , mois=mois , annee=annee)
                 jourPay = date(annee , mois , 1)
+                print(f"jour pay {jourPay} last pay {debuExo}")
                 
                 payer = True
                 # print(f"last pay {lastPay}")
