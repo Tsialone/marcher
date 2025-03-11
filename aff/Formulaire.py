@@ -9,7 +9,7 @@ class Formulaire(tk.Frame):
     def __init__(self, width: int, height: int, parent: F.Fenetre):
         super().__init__(parent, bg="lightgrey", width=width, height=height)
         self.pack_propagate(False)
-        self.place(x=720, y=10)
+        self.place(x=900, y=10)
         label = tk.Label(self, text="Formulaire", bg="lightgrey")
         label.pack(pady=20)
         self.Payementcomponent()
@@ -17,6 +17,12 @@ class Formulaire(tk.Frame):
         self.contratComponent()
 
     def Payementcomponent(self):
+        mois = [
+            "Janvier", "Fevrier", "Mars", "Avril", "Mai", "Juin", "Juillet",
+            "Aout", "Septembre", "Octobre", "Novembre", "Decembre"
+        ]
+        values = [i for i in range(2030, 2000, -1)]
+        
         # Combobox Locataire
         allLocataire = Locataire().getAll()
         locatairesId = [locataire.getIdLocataire() for locataire in allLocataire]
@@ -24,6 +30,21 @@ class Formulaire(tk.Frame):
         self.payementLocataire.place(x=10, y=50)
         if locatairesId:
             self.payementLocataire.insert(0, locatairesId[0])
+        #date de mayement
+        date_label = tk.Label(self, text="Date de payement", bg="lightgrey")
+        date_label.place(x=10, y=75) 
+        
+        self.date_payementAnnee = ttk.Combobox(self, values=values, width=7)
+        self.date_payementAnnee.place(x=10, y=95) 
+        self.date_payementAnnee.insert(0, "Annee")
+        
+        self.date_payementMois = ttk.Combobox(self, values=mois, width=7)
+        self.date_payementMois.place(x=80, y=95)  
+        self.date_payementMois.insert(0, "Mois")
+        
+        
+        
+        
 
         # Combobox Box
         allBox = Box().getAll()
@@ -34,16 +55,11 @@ class Formulaire(tk.Frame):
             self.payementBox.insert(0, boxsId[0])
 
         # Combobox Année
-        values = [i for i in range(2030, 2000, -1)]
         self.payementAnnee = ttk.Combobox(self, values=values, width=7)
         self.payementAnnee.place(x=190, y=50)  # Décalage vers la droite
         self.payementAnnee.insert(0, "Annee")
 
         # Combobox Mois
-        mois = [
-            "Janvier", "Fevrier", "Mars", "Avril", "Mai", "Juin", "Juillet",
-            "Aout", "Septembre", "Octobre", "Novembre", "Decembre"
-        ]
         self.payementMois = ttk.Combobox(self, values=mois, width=7)
         self.payementMois.place(x=260, y=50)  # Décalage vers la droite
         self.payementMois.insert(0, "Mois")
@@ -66,7 +82,7 @@ class Formulaire(tk.Frame):
             ),
             width=5,
         )
-        self.submit.place(x=430, y=50) # Décalage vers la droite
+        self.submit.place(x=150, y=95) # Décalage vers la droite
 
     def verificationComponent(self):
         # Première Combobox
@@ -74,7 +90,7 @@ class Formulaire(tk.Frame):
         for i in range(2030, 2000, -1):
             values.append(i)
         self.verificationAnnee = ttk.Combobox(self, values=values, width=10)
-        self.verificationAnnee.place(x=10, y=100)  # Aligner à gauche avec un padding
+        self.verificationAnnee.place(x=10, y=200)  # Aligner à gauche avec un padding
         self.verificationAnnee.insert(0, "Annee")
 
         # Deuxième Combobox
@@ -93,7 +109,7 @@ class Formulaire(tk.Frame):
             "Decembre",
         ]
         self.verificationMois = ttk.Combobox(self, values=mois, width=12)
-        self.verificationMois.place(x=100, y=100)  # Aligner à gauche avec un padding
+        self.verificationMois.place(x=100, y=200)  # Aligner à gauche avec un padding
         self.verificationMois.insert(0, "Mois")
 
         # payement submit
@@ -105,7 +121,7 @@ class Formulaire(tk.Frame):
             ),
             width=10,
         )
-        self.submitV.place(x=200, y=100)
+        self.submitV.place(x=200, y=200)
 
     def contratComponent(self):
         # Combobox pour les locataires
@@ -115,7 +131,7 @@ class Formulaire(tk.Frame):
             locataires.append(loc.getIdLocataire())
        
         self.contratLocataire = ttk.Combobox(self, values=locataires, width=10)
-        self.contratLocataire.place(x=10, y=150)
+        self.contratLocataire.place(x=10, y=250)
         if locataires:
             self.contratLocataire.insert(0, locataires[0])
 
@@ -123,18 +139,18 @@ class Formulaire(tk.Frame):
         allBox = Box().getAll()
         boxsId = [box.getIdBox() for box in allBox]
         self.contratBox = ttk.Combobox(self, values=boxsId, width=7)
-        self.contratBox.place(x=100, y=150)
+        self.contratBox.place(x=100, y=250)
         if boxsId:
             self.contratBox.insert(0, boxsId[0])
 
         # Entrée pour la date de début (MM-AAAA)
         self.contratDateDebut = ttk.Entry(self, width=10)  # Réduit la largeur
-        self.contratDateDebut.place(x=170, y=150)
+        self.contratDateDebut.place(x=170, y=250)
         self.contratDateDebut.insert(0, "MM-AAAA")
 
         # Entrée pour la date de fin (MM-AAAA)
         self.contratDateFin = ttk.Entry(self, width=10)  # Réduit la largeur
-        self.contratDateFin.place(x=240, y=150)
+        self.contratDateFin.place(x=240, y=250)
         self.contratDateFin.insert(0, "MM-AAAA")
 
         # Bouton pour valider
@@ -151,4 +167,4 @@ class Formulaire(tk.Frame):
             width=8,
         )  # Réduit la largeur
 
-        self.makeContratButton.place(x=310, y=150)
+        self.makeContratButton.place(x=310, y=250)

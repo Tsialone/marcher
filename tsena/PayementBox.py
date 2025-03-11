@@ -102,7 +102,7 @@ class PayementBox:
             
             for contrat in allSortedContrat:
                 # print(f" {contrat.getIdContrat()} {contrat.getIdBox()} {contrat.getIdLocataire()} {date(contrat.getAnneeDebut() , contrat.getMoisDebut() , 1)} {date(contrat.getAnneeFin() , contrat.getMoisFin() , 1)}" )
-                if   contrat.getIdBox() == idBox:
+                if   contrat.getIdBox() == idBox and  date (contrat.getAnneeDebut() , contrat.getMoisDebut() , 1 ) == date (annee , mois  , 1):
                     print(f"aa miala {idBox}")
                     break
                 if self.aPayer (idLocataire=idLocataire  , idBox=contrat.getIdBox() , mois=mois , annee=annee  ,  contrat=  contrat) is not True:
