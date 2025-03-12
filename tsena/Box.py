@@ -1,7 +1,7 @@
 from connection.Connection import *
 from datetime import *
 from matplotlib.patches import Rectangle
-from aff.Echelle import Echelle
+from display.Echelle import Echelle
 from tsena.Contrat import Contrat
 
 

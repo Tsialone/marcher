@@ -5,7 +5,7 @@ from tsena.Box import Box
 from tsena.MarcherBox import MarcherBox
 from tsena.Marcher import Marcher
 from dateutil.relativedelta import relativedelta
-from aff.Echelle import Echelle
+from display.Echelle import Echelle
 from tsena.Locataire import Locataire
 from tsena.Contrat import Contrat
 from fonction.Fonction import Fonction
@@ -78,7 +78,7 @@ class PayementBox:
                 allObjet.append(tempObjet)
         return allObjet
     
-    def insertPayementBox (self, idLocataire , idBox,mois:int , annee:int , montant:float ):
+    def insertPayementBox (self, idLocataire , idBox,mois:int , annee:int , montant:float   , payementMois:int , payementAnnee:int):
             montant *=  Echelle.valeur
             print(f"momo {montant}")
             tempLocataire = Locataire ()
@@ -96,11 +96,14 @@ class PayementBox:
             marcher  = None
             tokonyAloha = 0
             
+          
+            
             locataireContrat = tempLocataire.getContratByMoisAnnee(idBox=idBox, mois=mois  ,annee=annee)
             allSortedContrat = tempLocataire.getAncienContrat(tempLocataire.getIdLocataire())
             
             
             for contrat in allSortedContrat:
+                print(f"{contrat.getIdContrat() } {contrat.getIdLocataire()}")
                 # print(f" {contrat.getIdContrat()} {contrat.getIdBox()} {contrat.getIdLocataire()} {date(contrat.getAnneeDebut() , contrat.getMoisDebut() , 1)} {date(contrat.getAnneeFin() , contrat.getMoisFin() , 1)}" )
                 if   contrat.getIdBox() == idBox and  date (contrat.getAnneeDebut() , contrat.getMoisDebut() , 1 ) == date (annee , mois  , 1):
                     print(f"aa miala {idBox}")
@@ -182,10 +185,10 @@ class PayementBox:
                         print(f"reste a payer {resteApayer} tempMontant {tempMontant}")
                         if tokonyAloha != voalohaBox:
                             if tempMontant > 0:
-                                self.payer (idLocataire=idLocataire ,idBox=idBox , idContrat=locataireContrat.getIdContrat()  , mois=  lastPay.month ,annee= lastPay.year , montant=resteApayer)
+                                self.payer (idLocataire=idLocataire ,idBox=idBox , idContrat=locataireContrat.getIdContrat()  , mois=  lastPay.month ,annee= lastPay.year , montant=resteApayer , payementMois= payementMois , payementAnnee= payementAnnee)
                                 montant -= resteApayer
                             if tempMontant <= 0:
-                                self.payer (idLocataire=idLocataire ,  idBox=idBox , idContrat=locataireContrat.getIdContrat() , mois=  lastPay.month ,annee= lastPay.year , montant=montant)
+                                self.payer (idLocataire=idLocataire ,  idBox=idBox , idContrat=locataireContrat.getIdContrat() , mois=  lastPay.month ,annee= lastPay.year , montant=montant ,  payementMois= payementMois , payementAnnee= payementAnnee)
                                 montant = 0
                                 print(f"tss miala eto {montant} {idBox} tokony {tokonyAloha}")
                         if tokonyAloha == voalohaBox:
@@ -218,12 +221,13 @@ class PayementBox:
                         
 
                         
-    def payer(self, idLocataire, idBox, idContrat , mois, annee, montant ):
+    def payer(self, idLocataire, idBox, idContrat , mois, annee, montant  , payementMois , payementAnnee):
+        datePayement = date (payementAnnee , payementMois , 1)
         query = """
             INSERT INTO payement_box (idLocataire, idBox, idContrat , mois, annee, montant, datePayement)
-            VALUES (?, ?,?  ,?, ?, ?, Now())
+            VALUES (?, ?,?  ,?, ?, ?, ? )
         """
-        params = (idLocataire, idBox , idContrat, mois, annee, montant)
+        params = (idLocataire, idBox , idContrat, mois, annee, montant , datePayement)
         Connection.execute(query, params)
       
     def verificationDate ( self ,idBox  , mois:int , annee:int , idLocataire =None):

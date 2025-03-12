@@ -6,7 +6,7 @@ from matplotlib.patches import Rectangle
 import tkinter as tk
 from tsena.MarcherRa import MarcherRa
 from tsena.Box import Box
-from aff.Echelle import Echelle
+from display.Echelle import Echelle
 from tsena.Contrat import Contrat
 # from fonction.Ecouteur import Ecouteur
 

@@ -90,32 +90,34 @@ class Contrat:
             allObjet.append(tempObjet)
         return allObjet
 
-    def insert(self):
+    def insert(self, idLocataire, idBox):
         allContrat = self.getAll()
         for contrat in allContrat:
-                dateDebut_contrat = date(
-                    contrat.getAnneeDebut(), contrat.getMoisDebut(), 1
-                )
-                dateFin_contrat = date(contrat.getAnneeFin(), contrat.getMoisFin(), 1)
-                dateFin_contrat = dateFin_contrat - relativedelta(months=1)  
-                
-                dateDebut_nouveau = date(self.__anneeDebut, self.__moisDebut, 1)
-                dateFin_nouveau = date(self.__anneeFin, self.__moisFin, 1)
+            dateDebut_contrat = date(contrat.getAnneeDebut(), contrat.getMoisDebut(), 1)
+            dateFin_contrat = date(contrat.getAnneeFin(), contrat.getMoisFin(), 1)
+            dateFin_contrat = dateFin_contrat - relativedelta(months=1)
 
-                if (
-                    Fonction.intersectDate(
-                        dateDebut_contrat, dateFin_contrat, dateDebut_nouveau
-                    )
-                    or Fonction.intersectDate(
-                        dateDebut_contrat, dateFin_contrat, dateFin_nouveau
-                    )
-                    or Fonction.intersectDate(
-                        dateDebut_nouveau, dateFin_nouveau, dateDebut_contrat
-                    )
-                    or Fonction.intersectDate(
-                        dateDebut_nouveau, dateFin_nouveau, dateFin_contrat
-                    )
-                ):
+            dateDebut_nouveau = date(self.__anneeDebut, self.__moisDebut, 1)
+            dateFin_nouveau = date(self.__anneeFin, self.__moisFin, 1)
+
+            if (
+                Fonction.intersectDate(
+                    dateDebut_contrat, dateFin_contrat, dateDebut_nouveau
+                )
+                or Fonction.intersectDate(
+                    dateDebut_contrat, dateFin_contrat, dateFin_nouveau
+                )
+                or Fonction.intersectDate(
+                    dateDebut_nouveau, dateFin_nouveau, dateDebut_contrat
+                )
+                or Fonction.intersectDate(
+                    dateDebut_nouveau, dateFin_nouveau, dateFin_contrat
+                )
+            ):
+                # print(f" {contrat.getIdContrat()} {contrat.getIdLocataire()} {contrat.getIdBox()}")
+                # print(f"{idBox} {idLocataire}")
+                
+                if  (contrat.getIdBox() == idBox or contrat.getIdLocataire() != idLocataire):
                     raise ValueError(
                         f"Les dates du contrat chevauchent un contrat existant pour la box {contrat.getIdBox()}\n{contrat.getIdLocataire()}."
                     )
@@ -160,7 +162,7 @@ class Contrat:
                     contrat.getAnneeDebut(), contrat.getMoisDebut(), 1
                 )
                 dateFin_contrat = date(contrat.getAnneeFin(), contrat.getMoisFin(), 1)
-                dateFin_contrat = dateFin_contrat - relativedelta(months=1)  
+                dateFin_contrat = dateFin_contrat - relativedelta(months=1)
                 if Fonction.intersectDate(
                     dateDebut_contrat, dateFin_contrat, dateVerify
                 ):
@@ -184,9 +186,9 @@ class Contrat:
                     contrat.update()
         raise Exception("Pour annuler le contrat il faut etre dans le contrat")
 
-    def geContratByLocaBox(self, idLocataire, idBox ,mois: int, annee: int):
+    def geContratByLocaBox(self, idLocataire, idBox, mois: int, annee: int):
         dateVerifie = date(annee, mois, 1)
-        tempcontrat = Contrat() 
+        tempcontrat = Contrat()
         allContrat = tempcontrat.getAll()
 
         for contrat in allContrat:
@@ -198,8 +200,8 @@ class Contrat:
                 if Fonction.intersectDate(
                     dateDebut_contrat, dateFin_contrat, dateVerifie
                 ):
-                    return contrat 
-        return None  
+                    return contrat
+        return None
 
 
 # tempContrat = Contrat()

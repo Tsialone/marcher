@@ -1,7 +1,7 @@
 import pyodbc
 
 class Connection:
-    dbFile = r'E:\ITU\L2\S4\INF\Prog\Marcher\sql\marcher.accdb'
+    dbFile = r'E:\ITU\L2\S4\INF\Prog\python\Marcher\sql\marcher.accdb'
     connStr = rf'DRIVER={{Microsoft Access Driver (*.mdb, *.accdb)}};DBQ={dbFile}'
     conn = None
 

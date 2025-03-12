@@ -1,5 +1,5 @@
 from datetime import date
-from aff import Carte
+from display import Carte
 from tsena.Marcher import Marcher
 from tsena.MarcherBox import MarcherBox
 from tsena.PayementBox import PayementBox
