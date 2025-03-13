@@ -3,7 +3,6 @@ from tsena.Contrat import Contrat
 from datetime import *
 from fonction.Fonction import Fonction
 from dateutil.relativedelta import relativedelta
-from tsena.Marcher import Marcher
 class Locataire:
     def __init__(self, idLocataire=None, nomLocataire=None):
         self.__idLocataire = idLocataire
@@ -70,10 +69,10 @@ class Locataire:
         if locataireContrat:
             return date (locataireContrat.getAnneeFin()  , locataireContrat.getMoisFin () , 1)
         return None
-    def getAncienContrat (self , idLocataire):
-        allContrats = self.getContrats (idLocataire=idLocataire)
+    def getAncienContrat (self ):
+        allContrats = self.getContrats (idLocataire=self.getIdLocataire())
         contrats_tries = sorted(allContrats, key=lambda contrat: date(contrat.getAnneeDebut(), contrat.getMoisDebut(), 1))
-        # for contrat in contrats_tries:
+        
         return contrats_tries
         
     def getContrats (self , idLocataire):

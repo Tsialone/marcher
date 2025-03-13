@@ -1,13 +1,12 @@
 from tkinter import messagebox
 from connection.Connection import *
-from fonction.Mouse import Mouse
 from fonction.Fonction import *
-from matplotlib.patches import Rectangle
 import tkinter as tk
 from tsena.MarcherRa import MarcherRa
 from tsena.Box import Box
 from display.Echelle import Echelle
 from tsena.Contrat import Contrat
+
 # from fonction.Ecouteur import Ecouteur
 
 
@@ -123,7 +122,6 @@ class Marcher:
                 print(f"io ny contrat any {tempContrat.getIdContrat()}")
                 boxSurface = box.getSurface()
                 from tsena.PayementBox import PayementBox
-
                 tempPayementBox = PayementBox()
                 tokonyAloha = (
                     self.getPrixLocation(mois=mois, annee=annee, insertion=False)
@@ -230,3 +228,5 @@ class Marcher:
             text=self.getIdMarcher(),
             font=("Arial", 10, "bold", "italic"),
         )
+
+

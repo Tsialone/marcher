@@ -2,6 +2,9 @@ from matplotlib.dates import relativedelta
 from connection.Connection import *
 from datetime import *
 from fonction.Fonction import Fonction
+from tsena.Mois import Mois
+
+# from tsena.Mois import Mois
 
 
 class Contrat:
@@ -14,7 +17,8 @@ class Contrat:
         anneeDebut=None,
         moisFin=None,
         anneeFin=None,
-        dateSignature=None,
+        dateSignature=None
+
     ):
         self.__idContrat = idContrat
         self.__idBox = idBox
@@ -24,10 +28,16 @@ class Contrat:
         self.__moisFin = moisFin
         self.__anneeFin = anneeFin
         self.__dateSignature = dateSignature
+        self.__mois = []
+        
+        
 
     def getIdContrat(self):
         return self.__idContrat
-
+    def getMois(self):
+        return self.__mois
+    def setMois (self , mois):
+        self.__mois = mois
     def getIdBox(self):
         return self.__idBox
 
@@ -202,7 +212,29 @@ class Contrat:
                 ):
                     return contrat
         return None
+    
+
+    def initMois (self , marcher , box):
+        hisMois  = []
+        dateDebut = date (self.getAnneeDebut() , self.getMoisDebut() , 1)
+        dateFin = date (self.getAnneeFin() , self.getMoisFin() , 1)
+        while (dateDebut < dateFin):
+            tempMois = Mois(dateDebut.month , dateDebut.year , contrat=self)
+            tempMois.setTokonyAloha(tempMois.tokonyAloha(marcher=marcher , box=box))
+            hisMois.append(tempMois)
+            dateDebut = dateDebut + relativedelta(months=1)
+        self.setMois(hisMois)
+        
+        
+    
 
 
-# tempContrat = Contrat()
+        
+
+
+# contrat = Contrat(1 , "B1" , "Loc1" , 5 ,  2024  , 10 , 2024 ,  date.today())
+# contrat.initMois()
+
+# for mois in contrat.getMois():
+    # print(f"{mois.getValeur()} { mois.getAnnee() }  {mois.getContrat().getIdContrat()}  {mois.getVoaloha()}")
 # tempContrat.arretContrat("Loc1" , "B1" , 12 , 2024)

@@ -51,7 +51,7 @@ def execute_sql_file(access_db_path, sql_file_path):
 
 if __name__ == "__main__":
     # Demander le chemin du fichier Access et du fichier SQL
-    access_db_path = r'E:\ITU\L2\S4\INF\Prog\Marcher\sql\marcher.accdb'
+    access_db_path = r'E:\ITU\L2\S4\INF\Prog\python\Marcher\sql\marcher.accdb'
     sql_file_path = input("Entrez le chemin du fichier .sql : ").strip()
 
     execute_sql_file(access_db_path, "sql/"+sql_file_path + ".sql")

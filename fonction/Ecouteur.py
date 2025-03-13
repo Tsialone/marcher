@@ -44,11 +44,10 @@ class Ecouteur:
     }
 
     def payementBlock(
-        idLocataire, idBox, mois, annee, montant, payementMois, payementAnnee
+        idLocataire, mois, annee, montant, payementMois, payementAnnee
     ):
         try:
 
-            idBox = idBox.get()
             idLocataire = idLocataire.get()
             mois = Ecouteur.moisMapping[mois.get()]
             annee = int(annee.get())
@@ -62,7 +61,6 @@ class Ecouteur:
             payement = PayementBox()
             payement.insertPayementBox(
                 idLocataire=idLocataire,
-                idBox=idBox,
                 mois=mois,
                 annee=annee,
                 montant=montant,

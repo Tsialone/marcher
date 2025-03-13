@@ -48,27 +48,27 @@ class Formulaire(tk.Frame):
         
         
 
-        # Combobox Box
-        allBox = Box().getAll()
-        boxsId = [box.getIdBox() for box in allBox]
-        self.payementBox = ttk.Combobox(self, values=boxsId, width=10)
-        self.payementBox.place(x=100, y=50)  # Rapprochement avec Locataire
-        if boxsId:
-            self.payementBox.insert(0, boxsId[0])
+        # # Combobox Box
+        # allBox = Box().getAll()
+        # boxsId = [box.getIdBox() for box in allBox]
+        # self.payementBox = ttk.Combobox(self, values=boxsId, width=10)
+        # self.payementBox.place(x=100, y=50)  # Rapprochement avec Locataire
+        # if boxsId:
+        #     self.payementBox.insert(0, boxsId[0])
 
         # Combobox Année
         self.payementAnnee = ttk.Combobox(self, values=values, width=7)
-        self.payementAnnee.place(x=190, y=50)  # Décalage vers la droite
+        self.payementAnnee.place(x=95, y=50)  # Décalage vers la droite
         self.payementAnnee.insert(0, "Annee")
 
         # Combobox Mois
         self.payementMois = ttk.Combobox(self, values=mois, width=7)
-        self.payementMois.place(x=260, y=50)  # Décalage vers la droite
+        self.payementMois.place(x=165, y=50)  # Décalage vers la droite
         self.payementMois.insert(0, "Mois")
 
         # Entry Montant
         self.Payementmontant = ttk.Entry(self, width=15)
-        self.Payementmontant.place(x=330, y=50)  # Décalage vers la droite
+        self.Payementmontant.place(x=235, y=50)  # Décalage vers la droite
         self.Payementmontant.insert(0, "Montant")
 
         # Bouton Payer
@@ -77,7 +77,6 @@ class Formulaire(tk.Frame):
             text="Payer",
             command=lambda: Ecouteur.payementBlock(
                 self.payementLocataire, # Ajout de payementLocataire
-                self.payementBox,
                 self.payementMois,
                 self.payementAnnee,
                 self.Payementmontant,
