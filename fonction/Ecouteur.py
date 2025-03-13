@@ -7,6 +7,8 @@ from fonction.Data import Data
 from fonction.Fonction import Fonction
 from tsena.Contrat import Contrat
 import pyodbc
+from decimal import Decimal
+
 
 
 class Ecouteur:
@@ -57,7 +59,7 @@ class Ecouteur:
 
             print(f"Ito zah ito ee {payementMois} {payementAnnee}")
 
-            montant = float(montant.get())
+            montant = Decimal(value=str(montant.get()))
             payement = PayementBox()
             payement.insertPayementBox(
                 idLocataire=idLocataire,

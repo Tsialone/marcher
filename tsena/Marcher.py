@@ -118,43 +118,34 @@ class Marcher:
         for box in self.getBoxs():
             tempContrat = Contrat()
             tempContrat = tempContrat.getContratByIdBox(idBox=box.getIdBox() , mois=mois ,annee=annee)
+            
             if tempContrat:
-                print(f"io ny contrat any {tempContrat.getIdContrat()}")
-                boxSurface = box.getSurface()
-                from tsena.PayementBox import PayementBox
-                tempPayementBox = PayementBox()
-                tokonyAloha = (
-                    self.getPrixLocation(mois=mois, annee=annee, insertion=False)
-                    * boxSurface
-                )
-                voalohaBox = tempPayementBox.getPayerByIdLocationIdBox(
-                    tempContrat.getIdLocataire() ,idBox=box.getIdBox(), contrat=tempContrat
-                )
-                porcentageVoaloha = float  (voalohaBox) / float (tokonyAloha)
-                porcentageVoaloha *= 100
-                print(
-                    f"pourcentage voaloha {porcentageVoaloha}  {box.getIdBox()} tokony aloha {tokonyAloha}  voaloha {voalohaBox} boxsurface  {boxSurface}"
-                )
-                boxLargeur = box.getLargeur()
-                boxLongueur = box.getLongueur()
-                x = box.get_x()
-                y = box.get_y()
+                tempContrat.initMois (self  , box)
+                porcentageVoaloha = 0
+                moisAverifie = None
+                for tempContratMois in tempContrat.getMois():
+                    if tempContratMois.getAnnee() == annee and tempContratMois.getValeur () == mois:
+                        moisAverifie  =tempContratMois
+                if moisAverifie:
+                    # print(f"**debug Le mois a verifier est: {moisAverifie.getValeur() } {moisAverifie.getAnnee()} tokonyAloha: {moisAverifie.getTokonyAloha()}")
+                    porcentageVoaloha = float  (moisAverifie.getVoaloha()) / float (moisAverifie.getTokonyAloha())
+                    porcentageVoaloha *= 100
+                    boxLargeur = box.getLargeur()
+                    boxLongueur = box.getLongueur()
+                    x = box.get_x()
+                    y = box.get_y()
 
-                progressWidth = float(boxLargeur) * (porcentageVoaloha / 100)
+                    progressWidth = float(boxLargeur) * (porcentageVoaloha / 100)
 
-                self.__canvas.create_rectangle(
-                    x,
-                    y,
-                    float(x) + float(progressWidth),
-                    float(y) + float(boxLongueur),
-                    outline="black",
-                    fill="green",
-                )
-                centre_x = x + boxLargeur / 2
-                centre_y = y + boxLongueur / 2
-                # self.__canvas.create_text(
-                #     centre_x, centre_y, text=f"{box.getIdBox()}:{tempContrat.getIdLocataire()}", font=("Arial", 10) 
-                # )
+                    self.__canvas.create_rectangle(
+                        x,
+                        y,
+                        float(x) + float(progressWidth),
+                        float(y) + float(boxLongueur),
+                        outline="black",
+                        fill="green",
+                    )
+                
 
     def dessinerBox(self, carte , mois:int=None , annee:int=None):
         boxs = self.getBoxs()

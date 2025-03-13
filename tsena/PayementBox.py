@@ -99,7 +99,6 @@ class PayementBox:
                 )
                 allObjet.append(tempObjet)
         return allObjet
-
     def insertPayementBox(
         self,
         idLocataire,
@@ -134,7 +133,8 @@ class PayementBox:
         for contrat in allSortedContrat:
             for contratMois in contrat.getMois():
                 pourcentageMois = (
-                  float  (contratMois.getVoaloha()) /  float (contratMois.getTokonyAloha())
+                    float(contratMois.getVoaloha())
+                    / float(contratMois.getTokonyAloha())
                 ) * 100
                 if pourcentageMois != 100:
                     moisApayer = contratMois
@@ -144,8 +144,8 @@ class PayementBox:
                 if contrat.getIdContrat() != oderContrat.getIdContrat():
                     for orderContratMois in oderContrat.getMois():
                         pourcentageMois = (
-                         float (  orderContratMois.getVoaloha())
-                            /  float( orderContratMois.getTokonyAloha())
+                            float(orderContratMois.getVoaloha())
+                            / float(orderContratMois.getTokonyAloha())
                         ) * 100
                         if pourcentageMois != 100:
                             dateContrat = date(
@@ -159,7 +159,6 @@ class PayementBox:
                             if dateContrat > dateOderContrat:
                                 moisApayer = orderContratMois
                                 break
-                            
 
         if moisApayer:
             hisContrat = moisApayer.getContrat()
@@ -169,11 +168,12 @@ class PayementBox:
             print(
                 f"**debug  idLocataire: {hisContrat.getIdLocataire()} idBox: {hisContrat.getIdBox()} idContrat: {hisContrat.getIdContrat()} {moisApayer.getAnnee()} montant: {montant}"
             )
-            tempPourcentage = float (moisApayer.getVoaloha()) / float(moisApayer.getTokonyAloha())
             print(f"tempMontant {montant}")
-            reste = ( (float(montant) + float(moisApayer.getVoaloha())) - float(moisApayer.getTokonyAloha()))
-            if reste == 0 :
-                montant -= reste 
+            reste = (float(montant) + float(moisApayer.getVoaloha())) - float(
+                moisApayer.getTokonyAloha()
+            )
+            if reste == 0:
+                montant -= reste
                 self.payer(
                     idLocataire=idLocataire,
                     idBox=hisContrat.getIdBox(),
@@ -194,17 +194,17 @@ class PayementBox:
                     idContrat=hisContrat.getIdContrat(),
                     mois=moisApayer.getValeur(),
                     annee=moisApayer.getAnnee(),
-                    montant=montant-reste,
+                    montant=montant - reste,
                     payementMois=payementMois,
                     payementAnnee=payementAnnee,
                 )
                 self.insertPayementBox(
-                        idLocataire,
-                        mois,
-                        annee,
-                        reste,
-                        payementMois,
-                        payementAnnee,
+                    idLocataire,
+                    mois,
+                    annee,
+                    reste,
+                    payementMois,
+                    payementAnnee,
                 )
             elif reste < 0:
                 self.payer(
@@ -218,7 +218,7 @@ class PayementBox:
                     payementAnnee=payementAnnee,
                 )
                 return
-            
+
         print(f"Nombre de contrat:{len(allSortedContrat)}")
         for contrat in allSortedContrat:
             print(
@@ -228,157 +228,6 @@ class PayementBox:
                 print(
                     f"{mois.getValeur()} { mois.getAnnee() }  {mois.getVoaloha()} {mois.getTokonyAloha()}  => {(float(mois.getVoaloha()) / float(mois.getTokonyAloha()) * 100)}"
                 )
-
-            # contrat.initMois()
-        # if locataireContrat:
-        #     # print(f"contrat any t@ io date io =>{locataireContrat.getIdContrat()} {locataireContrat.getIdBox()} {locataireContrat.getIdLocataire()} {date(locataireContrat.getAnneeDebut() , locataireContrat.getMoisDebut() , 1)} {date(locataireContrat.getAnneeFin() , locataireContrat.getMoisFin() , 1)}")
-        #     # print(f"mois{mois} et anne{annee}")
-        #     tokonyAloha = (
-        #         marcher.getPrixLocation(mois=mois, annee=annee, insertion=False)
-        #         * boxSurface
-        #     )
-        #     voalohaBox = float(
-        #         self.getPayerByIdLocationIdBox(
-        #             idLocataire=idLocataire,
-        #             idBox=idBox,
-        #             idContrat=locataireContrat.getIdContrat(),
-        #             mois=mois,
-        #             annee=annee,
-        #         )
-        #     )
-        #     print(
-        #         f"tokony aloha {tokonyAloha },  voaloha: {voalohaBox}   idLocataire: {idLocataire } idBox: {idBox}  idContrat: {locataireContrat.getIdContrat()} mois: {mois} annee: {annee}"
-        #     )
-        # else:
-        #     raise Exception(
-        #         f"Vous n'avez pas louez cette box {idBox} ou fin de contrat pour {tempLocataire.getFinContrat(idBox=idBox , mois=mois , annee=annee)} {tempLocataire.getIdLocataire()}  "
-        #     )
-        # if marcher:
-        #     # vola
-        #     tokonyAloha = (
-        #         marcher.getPrixLocation(mois=mois, annee=annee, insertion=False)
-        #         * boxSurface
-        #     )
-        #     voalohaBox = self.getPayerByIdLocationIdBox(
-        #         idLocataire=idLocataire,
-        #         idBox=idBox,
-        #         idContrat=locataireContrat.getIdContrat(),
-        #         mois=mois,
-        #         annee=annee,
-        #     )
-        #     resteApayer = 0
-
-        #     lastPay = self.getLastPayByLocataireBox(
-        #         idLocataire=idLocataire,
-        #         idBox=idBox,
-        #         idContrat=locataireContrat.getIdContrat(),
-        #     )
-        #     debuExo = date(
-        #         locataireContrat.getAnneeDebut(), locataireContrat.getMoisDebut(), 1
-        #     )
-        #     # print(f"check debut exo>>> idLocataire: {idLocataire} idbox:{idBox} mois: {mois} annee: {annee} debuExo {debuExo} ")
-        #     jourPay = date(annee, mois, 1)
-        #     # print(f"jour pay {jourPay} last pay {debuExo}")
-
-        #     payer = True
-        #     # print(f"last pay {lastPay}")
-        #     if lastPay is None:
-        #         lastPay = debuExo
-        #     # print(f"last pay after ver {lastPay}")
-
-        #     if voalohaBox == tokonyAloha:
-        #         # pass
-        #         raise Exception(
-        #             "Vous avez deja payer la totalite cette date:\n" + str(jourPay)
-        #         )
-
-        #     print(f"check null joutPay {jourPay} lastPay {lastPay}")
-        #     if jourPay > lastPay:
-        #         pass
-        #         # response = messagebox.askquestion(
-        #         #     "Confirmation",
-        #         #     "Vous navez pas encore payez la totalite du "
-        #         #     + str(lastPay)
-        #         #     + "\npayer mantenant? xxxx",
-        #         # )
-        #         # if response == "yes":
-        #         # payer = True
-        #         # else:
-        #         # payer = False
-        #         # raise Exception("Payement revoquer")
-        #     # if allSortedContrat:
-        #     # for contrat in allSortedContrat:
-        #     # if self.aPayer (contrat.getIdLocataire() , contrat.getIdBox() , contrat.get)
-
-        #     if payer:
-        #         # fincontrat = date(
-        #         #     locataireContrat.getAnneeFin(), locataireContrat.getMoisFin(), 1
-        #         # )
-        #         # print(f">>>>>>>fin contrat {fincontrat} lastPay{lastPay} ")
-
-        #         # print(f"none ? {tempLocataire.getFinContrat(idBox=idBox , mois=staticMois , annee=staticAnnee)}  idBox:{idBox}  mois:{mois} annee:{annee}")
-        #         while (
-        #             montant > 0
-        #             and date(
-        #                 locataireContrat.getAnneeFin(), locataireContrat.getMoisFin(), 1
-        #             )
-        #             and lastPay
-        #             < date(
-        #                 locataireContrat.getAnneeFin(), locataireContrat.getMoisFin(), 1
-        #             )
-        #         ):
-        #             # print(f"last pay{lastPay} {tempLocataire.getFinContrat(idBox=idBox , mois=mois , annee=annee)} {tempLocataire.getIdLocataire()}")
-
-        #             mois = lastPay.month
-        #             annee = lastPay.year
-        #             print(f"lastPay mois: {mois} annee: {annee}")
-        #             tokonyAloha = (
-        #                 marcher.getPrixLocation(mois=mois, annee=annee) * boxSurface
-        #             )
-        #             voalohaBox = float(
-        #                 self.getPayerByIdLocationIdBox(
-        #                     idLocataire=idLocataire,
-        #                     idBox=idBox,
-        #                     idContrat=locataireContrat.getIdContrat(),
-        #                     mois=mois,
-        #                     annee=annee,
-        #                 )
-        #             )
-        #             resteApayer = tokonyAloha - voalohaBox
-        #             tempMontant = montant - resteApayer
-        #             print(f"mois: {mois} annee:{annee}")
-        #             print(
-        #                 f"**debug reste a payer {resteApayer} tokony aloha {tokonyAloha} tempMontant {tempMontant} voaloah {voalohaBox}"
-        #             )
-        #             if tokonyAloha != voalohaBox:
-        #                 if tempMontant > 0:
-        #                     print("--------------tady tsy ho hita eo")
-        #                     self.payer(
-        #                         idLocataire=idLocataire,
-        #                         idBox=idBox,
-        #                         idContrat=locataireContrat.getIdContrat(),
-        #                         mois=lastPay.month,
-        #                         annee=lastPay.year,
-        #                         montant=resteApayer,
-        #                         payementMois=payementMois,
-        #                         payementAnnee=payementAnnee,
-        #                     )
-        #                     montant -= resteApayer
-        #                 if tempMontant <= 0:
-        #                     self.payer(
-        #                         idLocataire=idLocataire,
-        #                         idBox=idBox,
-        #                         idContrat=locataireContrat.getIdContrat(),
-        #                         mois=lastPay.month,
-        #                         annee=lastPay.year,
-        #                         montant=montant,
-        #                         payementMois=payementMois,
-        #                         payementAnnee=payementAnnee,
-        #                     )
-        #                     montant = 0
-        #             tempPayementBox = []
-        #             if tokonyAloha == voalohaBox:
-        #                 pass
 
     def payer(
         self,
