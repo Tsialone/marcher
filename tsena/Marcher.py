@@ -6,6 +6,9 @@ from tsena.MarcherRa import MarcherRa
 from tsena.Box import Box
 from display.Echelle import Echelle
 from tsena.Contrat import Contrat
+from decimal import Decimal, getcontext
+
+getcontext().prec = 10
 
 # from fonction.Ecouteur import Ecouteur
 
@@ -29,9 +32,9 @@ class Marcher:
         self.__nomMarcher = nomMarcher
         self.__prixLocation = prixLocation
         if longeur:
-            self.__longueur = longeur * Echelle.valeur
+            self.__longueur = longeur
         if largeur:
-            self.__largeur = largeur * Echelle.valeur
+            self.__largeur = largeur + 500
         self.__x = x
         self.__y = y
         self.__canvas = canvas
@@ -51,10 +54,13 @@ class Marcher:
 
     def setNomMarcher(self, nomMarcher: str):
         self.__nomMarcher = nomMarcher
-    def deleteComponent (self):
+
+    def deleteComponent(self):
         self.__canvas.delete("all")
-    def getCanvas (self):
+
+    def getCanvas(self):
         return self.__canvas
+
     def getPrixLocation(self, mois: int, annee: int, insertion=False):
         tempMarcherRa = MarcherRa()
         tempMarcherRa = tempMarcherRa.getMarcherRaByDate(
@@ -63,9 +69,20 @@ class Marcher:
         if tempMarcherRa:
             if insertion:
                 messagebox.showinfo(
-                    "Success", f"Changement de prix \n" + str(tempMarcherRa.getValeur()) + "Ar"+"\n" + tempMarcherRa.getIdMarcher() + "\n" + str(date(tempMarcherRa.getAnnee() , tempMarcherRa.getMois() , 1)))
-            return float(tempMarcherRa.getValeur() / Echelle.valeur)
-        return float(self.__prixLocation / Echelle.valeur)
+                    "Success",
+                    f"Changement de prix \n"
+                    + str(tempMarcherRa.getValeur())
+                    + "Ar"
+                    + "\n"
+                    + tempMarcherRa.getIdMarcher()
+                    + "\n"
+                    + str(date(tempMarcherRa.getAnnee(), tempMarcherRa.getMois(), 1)),
+                )
+            # return Decimal( str(tempMarcherRa.getValeur() / Echelle.valeur))
+            return Decimal(str(tempMarcherRa.getValeur()))
+
+        # return Decimal  ( self (self.__prixLocation / Echelle.valeur))
+        return Decimal(str((self.__prixLocation)))
 
     def getLongueur(self):
         return self.__longueur
@@ -116,38 +133,58 @@ class Marcher:
 
     def drawProgBox(self, mois, annee):
         for box in self.getBoxs():
-            tempContrat = Contrat()
-            tempContrat = tempContrat.getContratByIdBox(idBox=box.getIdBox() , mois=mois ,annee=annee)
-            
-            if tempContrat:
-                tempContrat.initMois (self  , box)
+            tempContrat = Contrat().getContratByIdBox(
+                idBox=box.getIdBox(), mois=mois, annee=annee
+            )
+
+            if not tempContrat:
+                continue  
+
+            tempContrat.initMois(self, box)
+            moisAverifie = next(
+                (
+                    contratMois
+                    for contratMois in tempContrat.getMois()
+                    if contratMois.getAnnee() == annee and contratMois.getValeur() == mois
+                ),
+                None,
+            )
+
+            if not moisAverifie:
+                continue  
+
+            try:
+                voaloha = float(moisAverifie.getVoaloha())
+                tokonyAloha = float(moisAverifie.getTokonyAloha())
+                porcentageVoaloha = (voaloha / tokonyAloha * 100) if tokonyAloha else 0
+            except (ValueError, ZeroDivisionError):
                 porcentageVoaloha = 0
-                moisAverifie = None
-                for tempContratMois in tempContrat.getMois():
-                    if tempContratMois.getAnnee() == annee and tempContratMois.getValeur () == mois:
-                        moisAverifie  =tempContratMois
-                if moisAverifie:
-                    # print(f"**debug Le mois a verifier est: {moisAverifie.getValeur() } {moisAverifie.getAnnee()} tokonyAloha: {moisAverifie.getTokonyAloha()}")
-                    porcentageVoaloha = float  (moisAverifie.getVoaloha()) / float (moisAverifie.getTokonyAloha())
-                    porcentageVoaloha *= 100
-                    boxLargeur = box.getLargeur()
-                    boxLongueur = box.getLongueur()
-                    x = box.get_x()
-                    y = box.get_y()
 
-                    progressWidth = float(boxLargeur) * (porcentageVoaloha / 100)
+            print(
+                f"Box {box.getIdBox()} - Mois: {moisAverifie.getValeur()}, "
+                f"Année: {moisAverifie.getAnnee()}, "
+                f"TokonyAloha: {moisAverifie.getTokonyAloha()}, "
+                f"Voaloha: {moisAverifie.getVoaloha()}, "
+                f"Progression: {porcentageVoaloha:.2f}%"
+            )
 
-                    self.__canvas.create_rectangle(
-                        x,
-                        y,
-                        float(x) + float(progressWidth),
-                        float(y) + float(boxLongueur),
-                        outline="black",
-                        fill="green",
-                    )
-                
+            boxLargeur = box.getLargeur() * Echelle.valeur
+            boxLongueur = box.getLongueur() * Echelle.valeur
+            x, y = box.get_x(), box.get_y()
 
-    def dessinerBox(self, carte , mois:int=None , annee:int=None):
+            progressWidth =  Decimal( str (boxLargeur)) *  Decimal (str(porcentageVoaloha / 100))
+
+            self.__canvas.create_rectangle(
+                x,
+                y,
+                x + progressWidth,
+                y + boxLongueur,
+                outline="black",
+                fill="green",
+            )
+
+
+    def dessinerBox(self, carte, mois: int = None, annee: int = None):
         boxs = self.getBoxs()
         tempContrat = Contrat()
         largeur = self.getLargeur()
@@ -174,11 +211,13 @@ class Marcher:
             for box in boxs:
                 boxContrat = None
                 if mois and annee:
-                    boxContrat = tempContrat.getContratByIdBox(box.getIdBox(), mois, annee)
+                    boxContrat = tempContrat.getContratByIdBox(
+                        box.getIdBox(), mois, annee
+                    )
                 # self.__canvas.bind("<Button-1>"  , lambda event: Mouse.clickGauche(event,box=box))
 
-                boxLargeur = box.getLargeur()
-                boxLongueur = box.getLongueur()
+                boxLargeur = box.getLargeur()  * Echelle.valeur
+                boxLongueur = box.getLongueur()  * Echelle.valeur
 
                 if x + boxLargeur + margin > largeur:
                     x = margin
@@ -192,7 +231,11 @@ class Marcher:
                 # box.set_width (box.getLargeur())
                 # box.set_height (box.getLongueur())
                 rect = self.__canvas.create_rectangle(
-                    (x, y), x + boxLargeur, y + boxLongueur, outline="black", fill=box.getColor()
+                    (x, y),
+                    x + boxLargeur,
+                    y + boxLongueur,
+                    outline="black",
+                    fill=box.getColor(),
                 )
                 box.set_xy((x, y))
                 # box.set_width (box.getLargeur())
@@ -204,9 +247,8 @@ class Marcher:
                 if boxContrat:
                     locId = boxContrat.getIdLocataire()
                 # self.__canvas.create_text(
-                #         centre_x, centre_y, text=f"{box.getIdBox()}:{locId} ", font=("Arial", 10) 
+                #         centre_x, centre_y, text=f"{box.getIdBox()}:{locId} ", font=("Arial", 10)
                 # )
-               
 
                 x += boxLargeur + margin
                 max_row_height = max(max_row_height, boxLongueur)
@@ -219,5 +261,3 @@ class Marcher:
             text=self.getIdMarcher(),
             font=("Arial", 10, "bold", "italic"),
         )
-
-

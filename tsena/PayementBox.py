@@ -8,6 +8,9 @@ from dateutil.relativedelta import relativedelta
 from display.Echelle import Echelle
 from tsena.Locataire import Locataire
 from tsena.Marcher import Marcher
+from decimal import Decimal, getcontext
+
+getcontext().prec = 10
 
 
 class PayementBox:
@@ -99,136 +102,136 @@ class PayementBox:
                 )
                 allObjet.append(tempObjet)
         return allObjet
+
+ 
     def insertPayementBox(
         self,
         idLocataire,
         mois: int,
         annee: int,
-        montant: float,
+        montant,
         payementMois: int,
         payementAnnee: int,
     ):
-        montant *= Echelle.valeur
-        print(
-            f"Miantso ********************* mois: {mois} annee: {annee} idLocataire: {idLocataire}"
-        )
-        tempLocataire = Locataire()
-        tempLocataire = tempLocataire.getById(idLocataire=idLocataire)
-        tempBox = Box()
-        tempMarcherBox = MarcherBox()
-        allMarcherBox = tempMarcherBox.getAll()
-        tempMarcher = Marcher()
+        print(f"Miantso *** mois: {mois} annee: {annee} idLocataire: {idLocataire}")
 
+        tempLocataire = Locataire().getById(idLocataire=idLocataire)
         allSortedContrat = tempLocataire.getAncienContrat()
-        for contrat in allSortedContrat:
-            marcher = None
-            contratBox = tempBox.getById(contrat.getIdBox())
-            for marcherBox in allMarcherBox:
-                if marcherBox.getIdBox() == contrat.getIdBox():
-                    marcher = tempMarcher.getById(marcherBox.getIdMarcher())
-                    break
-            contrat.initMois(marcher, contratBox)
 
+        box_dict = {box.getIdBox(): box for box in Box().getAll()}
+        marcherBox_list = MarcherBox().getAll()
+        marcherBox_dict = {mb.getIdBox(): mb for mb in marcherBox_list}
+        marcher_dict = {}
+        for contrat in allSortedContrat:
+            box_id = contrat.getIdBox()
+            marcherBox = marcherBox_dict.get(box_id)
+
+            if marcherBox:
+                marcher_id = marcherBox.getIdMarcher()
+                if marcher_id not in marcher_dict:
+                    marcher_dict[marcher_id] = Marcher().getById(marcher_id)
+                marcher = marcher_dict[marcher_id]
+
+                contratBox = box_dict.get(box_id)
+                contrat.initMois(marcher, contratBox)
+
+        # Trouver le premier mois à payer
+        moisApayer = self.findMoisApayer(allSortedContrat)
+
+        if not moisApayer:
+            print("Aucun mois à payer trouvé.")
+            return
+
+        self.processPayment(
+            idLocataire,
+            moisApayer,
+            montant,
+            payementMois,
+            payementAnnee,
+            allSortedContrat
+        )
+
+    def findMoisApayer(self, allSortedContrat):
         moisApayer = None
         for contrat in allSortedContrat:
-            for contratMois in contrat.getMois():
-                pourcentageMois = (
-                    float(contratMois.getVoaloha())
-                    / float(contratMois.getTokonyAloha())
-                ) * 100
-                if pourcentageMois != 100:
-                    moisApayer = contratMois
-                    # print(f"HELLLLO {moisApayer.getValeur() } {moisApayer.getAnnee()} {moisApayer.getContrat().getIdContrat()}")
-                    break
-            for oderContrat in allSortedContrat:
-                if contrat.getIdContrat() != oderContrat.getIdContrat():
-                    for orderContratMois in oderContrat.getMois():
-                        pourcentageMois = (
-                            float(orderContratMois.getVoaloha())
-                            / float(orderContratMois.getTokonyAloha())
-                        ) * 100
-                        if pourcentageMois != 100:
-                            dateContrat = date(
-                                moisApayer.getAnnee(), moisApayer.getValeur(), 1
-                            )
-                            dateOderContrat = date(
-                                orderContratMois.getAnnee(),
-                                orderContratMois.getValeur(),
-                                1,
-                            )
-                            if dateContrat > dateOderContrat:
-                                moisApayer = orderContratMois
-                                break
-
-        if moisApayer:
-            hisContrat = moisApayer.getContrat()
-            print(
-                f"**debug Le mois a payer est: {moisApayer.getValeur() } {moisApayer.getAnnee()} tokonyAloha: {moisApayer.getTokonyAloha()}"
-            )
-            print(
-                f"**debug  idLocataire: {hisContrat.getIdLocataire()} idBox: {hisContrat.getIdBox()} idContrat: {hisContrat.getIdContrat()} {moisApayer.getAnnee()} montant: {montant}"
-            )
-            print(f"tempMontant {montant}")
-            reste = (float(montant) + float(moisApayer.getVoaloha())) - float(
-                moisApayer.getTokonyAloha()
-            )
-            if reste == 0:
-                montant -= reste
-                self.payer(
-                    idLocataire=idLocataire,
-                    idBox=hisContrat.getIdBox(),
-                    idContrat=hisContrat.getIdContrat(),
-                    mois=moisApayer.getValeur(),
-                    annee=moisApayer.getAnnee(),
-                    montant=montant,
-                    payementMois=payementMois,
-                    payementAnnee=payementAnnee,
-                )
-            elif reste > 0:
-                print(f"Misy reste {reste}")
-                print(f"ito zany no aloha ato {montant - reste}")
-                # raise Exception (f"misy reste e{reste}")
-                self.payer(
-                    idLocataire=idLocataire,
-                    idBox=hisContrat.getIdBox(),
-                    idContrat=hisContrat.getIdContrat(),
-                    mois=moisApayer.getValeur(),
-                    annee=moisApayer.getAnnee(),
-                    montant=montant - reste,
-                    payementMois=payementMois,
-                    payementAnnee=payementAnnee,
-                )
-                self.insertPayementBox(
-                    idLocataire,
-                    mois,
-                    annee,
-                    reste,
-                    payementMois,
-                    payementAnnee,
-                )
-            elif reste < 0:
-                self.payer(
-                    idLocataire=idLocataire,
-                    idBox=hisContrat.getIdBox(),
-                    idContrat=hisContrat.getIdContrat(),
-                    mois=moisApayer.getValeur(),
-                    annee=moisApayer.getAnnee(),
-                    montant=montant,
-                    payementMois=payementMois,
-                    payementAnnee=payementAnnee,
-                )
-                return
-
-        print(f"Nombre de contrat:{len(allSortedContrat)}")
-        for contrat in allSortedContrat:
-            print(
-                f"Contrat: {contrat.getIdContrat()} idBox: {contrat.getIdBox()}  idLocataire: {contrat.getIdLocataire()}"
-            )
             for mois in contrat.getMois():
-                print(
-                    f"{mois.getValeur()} { mois.getAnnee() }  {mois.getVoaloha()} {mois.getTokonyAloha()}  => {(float(mois.getVoaloha()) / float(mois.getTokonyAloha()) * 100)}"
-                )
+                voaloha = Decimal(mois.getVoaloha())
+                tokonyAloha = Decimal(mois.getTokonyAloha())
 
+                if voaloha < tokonyAloha:
+                    if not moisApayer:
+                        moisApayer = mois
+                    else:
+                        date_current = date(mois.getAnnee(), mois.getValeur(), 1)
+                        date_selected = date(moisApayer.getAnnee(), moisApayer.getValeur(), 1)
+                        if date_current < date_selected:
+                            moisApayer = mois
+        return moisApayer
+
+    def processPayment(self, idLocataire, moisApayer, montant, payementMois, payementAnnee, allSortedContrat):
+        hisContrat = moisApayer.getContrat()
+
+        print(
+            f"**debug Payer {moisApayer.getValeur()}/{moisApayer.getAnnee()} "
+            f"tokonyAloha: {moisApayer.getTokonyAloha()} "
+            f"voaloha: {moisApayer.getVoaloha()} montant: {montant}"
+        )
+
+        dejaPaye = Decimal(moisApayer.getVoaloha())
+        aPayer = Decimal(moisApayer.getTokonyAloha()) - dejaPaye
+
+        reste = Decimal(montant) - aPayer
+
+        # Cas 1 : Montant pile ce qu'il faut
+        if reste == 0:
+            self.payer(
+                idLocataire,
+                hisContrat.getIdBox(),
+                hisContrat.getIdContrat(),
+                moisApayer.getValeur(),
+                moisApayer.getAnnee(),
+                montant,
+                payementMois,
+                payementAnnee,
+            )
+            return
+
+        # Cas 2 : Trop payé, il reste de l'argent
+        if reste > 0:
+            self.payer(
+                idLocataire,
+                hisContrat.getIdBox(),
+                hisContrat.getIdContrat(),
+                moisApayer.getValeur(),
+                moisApayer.getAnnee(),
+                float(montant) - float(reste),
+                payementMois,
+                payementAnnee,
+            )
+            print(f"Reste: {reste}, appel récursif insertPayementBox...")
+            self.insertPayementBox(
+                idLocataire,
+                moisApayer.getValeur(),
+                moisApayer.getAnnee(),
+                float(reste),
+                payementMois,
+                payementAnnee,
+            )
+            return
+
+        # Cas 3 : Pas assez, il reste encore à payer
+        if reste < 0:
+            self.payer(
+                idLocataire,
+                hisContrat.getIdBox(),
+                hisContrat.getIdContrat(),
+                moisApayer.getValeur(),
+                moisApayer.getAnnee(),
+                montant,
+                payementMois,
+                payementAnnee,
+            )
+            return
     def payer(
         self,
         idLocataire,

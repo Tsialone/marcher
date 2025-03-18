@@ -1,2 +1,2 @@
 class Echelle:
-    valeur = 10
+    valeur = 20

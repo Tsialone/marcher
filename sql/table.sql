@@ -10,7 +10,7 @@ CREATE TABLE marcher (
 
 CREATE TABLE box (
     idBox TEXT(255) PRIMARY KEY,
-    nomBox TEXT(255),
+    nomBox INTEGER,
     longueur CURRENCY,
     largeur CURRENCY
 );

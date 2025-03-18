@@ -3,6 +3,8 @@ from datetime import *
 from matplotlib.patches import Rectangle
 from display.Echelle import Echelle
 from tsena.Contrat import Contrat
+from decimal import Decimal, getcontext
+getcontext().prec = 10
 
 
 class Box(Rectangle):
@@ -11,8 +13,12 @@ class Box(Rectangle):
             super().__init__((0, 0), largeur, longeur)
         self.__idBox = idBox
         self.__nomBox = nomBox
-        if longeur:self.__longeur = longeur * Echelle.valeur
-        if largeur :self.__largeur = largeur * Echelle.valeur
+        # if longeur:self.__longeur = longeur * Echelle.valeur
+        if longeur:self.__longeur = longeur 
+        
+        # if largeur :self.__largeur = largeur * Echelle.valeur
+        if largeur :self.__largeur = largeur 
+        
         
         self.__color = "white"
 
@@ -55,7 +61,7 @@ class Box(Rectangle):
         return allObjet
 
     def getSurface(self):
-        return float(self.getLargeur() * self.getLongueur())
+        return Decimal( str( self.getLargeur() * self.getLongueur()))
 
     def deleteById(self, idBox):
         query = "DELETE FROM box WHERE idBox=?"

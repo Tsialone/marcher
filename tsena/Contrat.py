@@ -29,9 +29,17 @@ class Contrat:
         self.__anneeFin = anneeFin
         self.__dateSignature = dateSignature
         self.__mois = []
+        self.__box = None
         
         
 
+    def getHisBox (self):
+        from tsena.Box import Box
+        temBox = Box ()
+        return temBox.getById(self.getIdBox())
+        
+        
+        
     def getIdContrat(self):
         return self.__idContrat
     def getMois(self):

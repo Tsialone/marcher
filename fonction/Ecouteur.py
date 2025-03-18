@@ -7,8 +7,12 @@ from fonction.Data import Data
 from fonction.Fonction import Fonction
 from tsena.Contrat import Contrat
 import pyodbc
-from decimal import Decimal
-
+from tsena.MarcherBox import MarcherBox
+from tsena.Locataire import Locataire
+from tsena.Marcher import Marcher
+from tsena.Box import Box
+from decimal import Decimal, getcontext
+getcontext().prec = 10
 
 
 class Ecouteur:
@@ -59,7 +63,7 @@ class Ecouteur:
 
             print(f"Ito zah ito ee {payementMois} {payementAnnee}")
 
-            montant = Decimal(value=str(montant.get()))
+            montant = Decimal (str(montant.get()))
             payement = PayementBox()
             payement.insertPayementBox(
                 idLocataire=idLocataire,
@@ -84,46 +88,59 @@ class Ecouteur:
             messagebox.showerror("Erreur", f"Une erreur est survenue :\n{str(e)}")
             print(traceback.format_exc())
 
-    def makeContrat(idLocataire, idBox, dateDebut, dateFin):
+    def dette(mois, annee , formulaire):
         try:
-            idLocataire_str = str(idLocataire.get())
-            idBox_str = str(idBox.get())
-            dateDebut_obj = Fonction.parse_date_mmaaaa(str(dateDebut.get()))
-            dateFin_obj = Fonction.parse_date_mmaaaa(str(dateFin.get()))
+            mois = Ecouteur.moisMapping[mois.get()]
+            annee = int(annee.get())
+            tempLocataire   =  Locataire()
+            allLocataire = tempLocataire.getAll()
+            deco = [
+            ]
+            
+            
+            
+            dateAvoir  = date (annee , mois , 1)
+            box_dict = {box.getIdBox(): box for box in Box().getAll()}
+            marcherBox_list = MarcherBox().getAll()
+            marcherBox_dict = {mb.getIdBox(): mb for mb in marcherBox_list}
+            marcher_dict = {}
+            
+            for locataire in allLocataire:
+                hisDette = 0
+                print(f"----------------------Locataire: {locataire.getIdLocataire()}--------------------------")
+                allSortedContrat = locataire.getAncienContrat()
+                for contrat in allSortedContrat:
+                    box_id = contrat.getIdBox()
+                    marcherBox = marcherBox_dict.get(box_id)
 
-            if dateDebut_obj > dateFin_obj:
-                raise Exception(
-                    f"La date de début ({dateDebut_obj}) doit être antérieure ou égale à la date de fin ({dateFin_obj})."
-                )
-            if dateDebut_obj < Data.dateExercice or dateFin_obj < Data.dateExercice:
-                raise Exception(
-                    "Le payement ne doit pas etre avant l'exercice "
-                    + str(Data.dateExercice)
-                )
+                    if marcherBox:
+                        marcher_id = marcherBox.getIdMarcher()
+                        if marcher_id not in marcher_dict:
+                            marcher_dict[marcher_id] = Marcher().getById(marcher_id)
+                        marcher = marcher_dict[marcher_id]
+                        contratBox = box_dict.get(box_id)
+                        contrat.initMois(marcher, contratBox)
+                for detteContrat in allSortedContrat:
+                    if date (detteContrat.getAnneeDebut() , detteContrat.getMoisDebut() , 1) < dateAvoir:
+                        hisMois = contrat.getMois()
+                        if hisMois:
+                            for mois in hisMois:
+                                tsyVoaloha  = mois.getTokonyAloha() - mois.getVoaloha()
+                                hisDette += tsyVoaloha
+                                # print(f"{mois.getValeur()} {mois.getAnnee()}")
+                deco.append ({"idLocataire":locataire.getIdLocataire()   , "dette":hisDette})
 
-            # Extraire mois et année
-            moisDebut = dateDebut_obj.month
-            anneeDebut = dateDebut_obj.year
-            moisFin = dateFin_obj.month
-            anneeFin = dateFin_obj.year
-
-            # Date de signature
-            dateSignature = date.today()
-
-            # Créer un objet Contrat
-            contrat = Contrat(
-                idBox=idBox_str,
-                idLocataire=idLocataire_str,
-                moisDebut=moisDebut,
-                anneeDebut=anneeDebut,
-                moisFin=moisFin,
-                anneeFin=anneeFin,
-                dateSignature=dateSignature,
-            )
+                    
+            
+                
+                
+           
+            
+            formulaire.textDette (deco)
+            
 
             # Insérer le contrat dans la base de données
-            contrat.insert(idLocataire=idLocataire_str   , idBox= idBox_str)
-            messagebox.showinfo("Success", f"Contrat effectuer")
+            # messagebox.showinfo("Success", f"Contrat effectuer")
 
             # messagebox.showinfo("Succès", "Contrat inséré avec succès.")
         except Exception as e:  # Capture les autres exceptions

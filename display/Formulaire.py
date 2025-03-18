@@ -12,6 +12,9 @@ class Formulaire(tk.Frame):
         self.place(x=900, y=10)
         label = tk.Label(self, text="Formulaire", bg="lightgrey")
         label.pack(pady=20)
+        self.idLocataireLabel  = []
+        self.detteLabel   = []
+        
         self.Payementcomponent()
         self.verificationComponent()
         self.contratComponent()
@@ -127,47 +130,65 @@ class Formulaire(tk.Frame):
         self.submitV.place(x=200, y=200)
 
     def contratComponent(self):
+        
+        mois = [
+            "Janvier", "Fevrier", "Mars", "Avril", "Mai", "Juin", "Juillet",
+            "Aout", "Septembre", "Octobre", "Novembre", "Decembre"
+        ]
+        values = [i for i in range(2030, 2000, -1)]
+        
+        self.dette_payementAnnee = ttk.Combobox(self, values=values, width=7)
+        self.dette_payementAnnee.place(x=10, y=250) 
+        now_month  = date.today().month
+        now_year = date.today().year
+        self.dette_payementAnnee.insert(0, now_year)
+        
+        self.date_payementMois = ttk.Combobox(self, values=mois, width=7)
+        self.date_payementMois.place(x=80, y=250)  
+        self.date_payementMois.insert(0, Ecouteur.moisMapping_reverse[now_month])
         # Combobox pour les locataires
-        tempLocataires = Locataire ()
-        locataires = []  
-        for loc in tempLocataires.getAll():
-            locataires.append(loc.getIdLocataire())
-       
-        self.contratLocataire = ttk.Combobox(self, values=locataires, width=10)
-        self.contratLocataire.place(x=10, y=250)
-        if locataires:
-            self.contratLocataire.insert(0, locataires[0])
-
-        # Combobox pour les boxes
-        allBox = Box().getAll()
-        boxsId = [box.getIdBox() for box in allBox]
-        self.contratBox = ttk.Combobox(self, values=boxsId, width=7)
-        self.contratBox.place(x=100, y=250)
-        if boxsId:
-            self.contratBox.insert(0, boxsId[0])
-
-        # Entrée pour la date de début (MM-AAAA)
-        self.contratDateDebut = ttk.Entry(self, width=10)  # Réduit la largeur
-        self.contratDateDebut.place(x=170, y=250)
-        self.contratDateDebut.insert(0, "MM-AAAA")
-
-        # Entrée pour la date de fin (MM-AAAA)
-        self.contratDateFin = ttk.Entry(self, width=10)  # Réduit la largeur
-        self.contratDateFin.place(x=240, y=250)
-        self.contratDateFin.insert(0, "MM-AAAA")
+        
 
         # Bouton pour valider
-        # idLocataire , idBox, dateDebut , dateFin
         self.makeContratButton = tk.Button(
             self,
-            text="Contrat",
-            command=lambda: Ecouteur.makeContrat(
-                self.contratLocataire,
-                self.contratBox,
-                self.contratDateDebut,
-                self.contratDateFin,
+            text="Dette",
+            command=lambda: Ecouteur.dette(
+                self.date_payementMois , 
+                self.dette_payementAnnee,
+                self
             ),
             width=8,
-        )  # Réduit la largeur
+        )  
 
-        self.makeContratButton.place(x=310, y=250)
+        self.makeContratButton.place(x=150, y=250)
+    def textDette(self,  lisDictionnary):
+        #colonnes
+        self.locataireColonne = tk.Label(self, text="Locataire", bg="lightgrey")
+        self.locataireColonne.place(x=10, y=280) 
+        
+        self.totalDette = tk.Label(self, text="Dette", bg="lightgrey")
+        self.totalDette.place(x=300, y=280) 
+        
+        margin = 300
+        self.idLocataireLabel.clear()
+        self.detteLabel.clear()
+        
+        for dico in lisDictionnary: 
+            idLocataire = dico["idLocataire"]
+            dette = dico["dette"]
+            self.idLocataireLabel.append(tk.Label(self, text=idLocataire, bg="lightgrey"))
+            self.detteLabel.append(tk.Label(self, text=dette, bg="lightgrey"))
+                
+                # self.idLocataire = tk.Label(self, text=idLocataire, bg="lightgrey")
+                # self.idLocataire.place(x=10, y=margin) 
+                # if self.dette:
+                #     self.dette.config(text="xxxx")
+                # else:
+                #     self.dette = tk.Label(self, text=dette, bg="lightgrey")
+                # margin += 20
+        
+        
+        
+        
+        
